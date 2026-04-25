@@ -10,11 +10,15 @@ export function Login() {
   const [role, setRole] = useState('student')
   const [isSignup, setIsSignup] = useState(false)
   const [name, setName] = useState('')
+  const [inviteCode, setInviteCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   
   const navigate = useNavigate()
   const { user, login, signup } = useAuthStore()
+
+  // Código de convite válido para Personal Trainers
+  const VALID_INVITE_CODE = 'TRAINER2024'
 
   useEffect(() => {
     if (user) {
@@ -28,6 +32,16 @@ export function Login() {
     setLoading(true)
 
     try {
+      // Validar código de convite para Personal Trainers
+      if (isSignup && role === 'personal_trainer') {
+        if (!inviteCode || inviteCode.trim() === '') {
+          throw new Error('Código de convite é obrigatório para Personal Trainers')
+        }
+        if (inviteCode !== VALID_INVITE_CODE) {
+          throw new Error('Código de convite inválido')
+        }
+      }
+
       if (isSignup) {
         await signup(email, password, name, role)
       } else {
@@ -129,17 +143,42 @@ export function Login() {
             </div>
 
             {isSignup && (
-              <div className="form-group">
-                <label htmlFor="role">Tipo de Conta</label>
-                <select
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <option value="student">Aluno</option>
-                  <option value="personal_trainer">Personal Trainer</option>
-                </select>
-              </div>
+              <>
+                <div className="form-group">
+                  <label htmlFor="role">Tipo de Conta</label>
+                  <select
+                    id="role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                  >
+                    <option value="student">Aluno</option>
+                    <option value="personal_trainer">Personal Trainer</option>
+                  </select>
+                </div>
+
+                {/* Campo de Código de Convite - aparece só para Personal Trainer */}
+                {role === 'personal_trainer' && (
+                  <motion.div
+                    className="form-group"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <label htmlFor="inviteCode">Código de Convite</label>
+                    <input
+                      type="text"
+                      id="inviteCode"
+                      value={inviteCode}
+                      onChange={(e) => setInviteCode(e.target.value)}
+                      placeholder="Digite o código de convite"
+                      required
+                    />
+                    <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
+                      Entre em contato com o administrador para obter seu código
+                    </small>
+                  </motion.div>
+                )}
+              </>
             )}
 
             <motion.button
@@ -160,7 +199,8 @@ export function Login() {
             </p>
             <code>
               Email: test@example.com<br />
-              Senha: 123456
+              Senha: 123456<br />
+              Código PT: TRAINER2024
             </code>
           </div>
         </motion.div>
