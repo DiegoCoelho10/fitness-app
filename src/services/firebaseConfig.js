@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyAYnJDgWX0RwCHHwaUlNoTAenl98dNxixM',
+  apiKey: 'AIzaSyBK7hpCtjQ6COYOFZw1k2l84tBbjfHqUdI',
   authDomain: 'fitness-app-7aa96.firebaseapp.com',
   projectId: 'fitness-app-7aa96',
   storageBucket: 'fitness-app-7aa96.firebasestorage.app',
