@@ -1,264 +1,66 @@
-.sidebar-toggle {
-  display: none;
-  position: fixed;
-  top: var(--spacing-md);
-  left: var(--spacing-md);
-  z-index: var(--z-sticky);
-  background-color: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  width: 44px;
-  height: 44px;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
+import React from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { useAuthStore } from '../context/authStore'
+import './Sidebar.css'
 
-.sidebar-toggle:hover {
-  border-color: var(--color-primary);
-  background-color: rgba(224, 120, 0, 0.05);
-}
+export function Sidebar({ isOpen, onClose }) {
+  const { userRole } = useAuthStore()
+  const location = useLocation()
 
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: var(--z-modal) - 1;
-  animation: fadeIn 0.2s ease;
-}
+  const isActive = (path) => location.pathname === path
 
-.sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 280px;
-  height: 100vh;
-  background-color: var(--color-bg-primary);
-  border-right: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  z-index: var(--z-fixed);
-  overflow-y: auto;
-  transition: transform 0.3s ease;
-}
+  const adminMenuItems = [
+    { path: '/dashboard', icon: '📊', label: 'Dashboard', exact: true },
+    { path: '/students', icon: '👥', label: 'Alunos' },
+    { path: '/workouts', icon: '💪', label: 'Treinos' },
+    { path: '/ranking', icon: '🏆', label: 'Ranking' },
+    { path: '/profile', icon: '⚙️', label: 'Perfil' },
+  ]
 
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
-}
+  const studentMenuItems = [
+    { path: '/dashboard', icon: '📊', label: 'Home', exact: true },
+    { path: '/profile', icon: '👤', label: 'Meu Perfil' },
+  ]
 
-.sidebar-header h2 {
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
-  color: var(--color-primary);
-  margin: 0;
-}
+  const menuItems = userRole === 'personal_trainer' ? adminMenuItems : studentMenuItems
 
-.sidebar-close {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  padding: var(--spacing-sm);
-}
+  return (
+    <>
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <h1>FIT</h1>
+          <p className="sidebar-role">
+            {userRole === 'personal_trainer' ? '💼 Trainer' : '💪 Aluno'}
+          </p>
+        </div>
 
-.sidebar-profile {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
-}
+        <nav className="sidebar-nav">
+          <ul className="nav-menu">
+            {menuItems.map(item => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
+                  onClick={onClose}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-label">{item.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-.profile-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-warning) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: var(--font-size-lg);
-  flex-shrink: 0;
-}
-
-.profile-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.profile-info h3 {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  margin: 0;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.profile-info p {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin: 0;
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: var(--spacing-md) 0;
-  overflow-y: auto;
-}
-
-.sidebar-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar-nav li {
-  margin: 0;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  width: 100%;
-  padding: var(--spacing-md) var(--spacing-md);
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  position: relative;
-  font-size: var(--font-size-base);
-  font-weight: 500;
-}
-
-.nav-item:hover {
-  background-color: var(--color-bg-secondary);
-  color: var(--color-primary);
-}
-
-.nav-item.active {
-  color: var(--color-primary);
-  background-color: rgba(224, 120, 0, 0.05);
-}
-
-.nav-item.logout {
-  color: var(--color-danger);
-}
-
-.nav-item.logout:hover {
-  background-color: rgba(217, 48, 37, 0.05);
-}
-
-.nav-indicator {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: var(--color-primary);
-  border-radius: 4px 0 0 4px;
-}
-
-.sidebar-footer {
-  padding: var(--spacing-md) 0;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-/* ===== RESPONSIVO ===== */
-@media (max-width: 768px) {
-  .sidebar-toggle {
-    display: flex;
-  }
-
-  .sidebar {
-    transform: translateX(-100%);
-    box-shadow: var(--shadow-xl);
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar-overlay {
-    display: block;
-  }
-
-  .sidebar-close {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .sidebar-header {
-    justify-content: space-between;
-  }
-
-  .sidebar-header h2 {
-    font-size: var(--font-size-xl);
-  }
-}
-
-@media (max-width: 480px) {
-  .sidebar {
-    width: 100%;
-    max-width: 280px;
-  }
-
-  .sidebar-profile {
-    gap: var(--spacing-sm);
-  }
-
-  .profile-avatar {
-    width: 40px;
-    height: 40px;
-    font-size: var(--font-size-base);
-  }
-
-  .profile-info h3 {
-    font-size: var(--font-size-xs);
-  }
-
-  .nav-item {
-    padding: var(--spacing-sm) var(--spacing-md);
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-  }
-}
-
-/* ===== SCROLLBAR ===== */
-.sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-dark);
+        <div className="sidebar-footer">
+          <div className="footer-info">
+            <p className="footer-text">
+              {userRole === 'personal_trainer'
+                ? 'Gerencie seus alunos e treinos'
+                : 'Acompanhe seu progresso'}
+            </p>
+          </div>
+        </div>
+      </aside>
+    </>
+  )
 }
