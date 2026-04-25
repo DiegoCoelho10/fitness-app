@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { useAuthStore } from '../context/authStore'
 import './Auth.css'
 
@@ -58,12 +57,7 @@ export function Login() {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <motion.div
-          className="auth-card"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="auth-card">
           {/* Header */}
           <div className="auth-header">
             <h1>FIT</h1>
@@ -95,13 +89,9 @@ export function Login() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="auth-form">
             {error && (
-              <motion.div
-                className="error-message"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+              <div className="error-message">
                 {error}
-              </motion.div>
+              </div>
             )}
 
             {isSignup && (
@@ -158,12 +148,7 @@ export function Login() {
 
                 {/* Campo de Código de Convite - aparece só para Personal Trainer */}
                 {role === 'personal_trainer' && (
-                  <motion.div
-                    className="form-group"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    transition={{ duration: 0.3 }}
-                  >
+                  <div className="form-group">
                     <label htmlFor="inviteCode">Código de Convite</label>
                     <input
                       type="text"
@@ -176,20 +161,18 @@ export function Login() {
                     <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
                       Entre em contato com o administrador para obter seu código
                     </small>
-                  </motion.div>
+                  </div>
                 )}
               </>
             )}
 
-            <motion.button
+            <button
               type="submit"
               className="btn btn-primary btn-lg"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
               disabled={loading}
             >
               {loading ? 'Carregando...' : isSignup ? 'Criar conta' : 'Entrar'}
-            </motion.button>
+            </button>
           </form>
 
           {/* Demo Info */}
@@ -203,7 +186,7 @@ export function Login() {
               Código PT: TRAINER2024
             </code>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   )
