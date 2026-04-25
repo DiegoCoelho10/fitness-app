@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../context/authStore'
-import { createWorkout, getStudent } from '../services/firebaseService'
+import { createWorkout, getStudent, sendNotification } from '../services/firebaseService'
 import './CreateWorkout.css'
 
 export function CreateWorkout() {
@@ -52,6 +52,12 @@ export function CreateWorkout() {
 
     try {
       await createWorkout(user.uid, studentId, formData)
+      await sendNotification(studentId, {
+        type: 'workout',
+        title: 'Novo Treino!',
+        body: `${formData.name} foi atribuído a você`,
+        actionUrl: `/dashboard`
+      })
       navigate(`/chat/${studentId}`)
     } catch (error) {
       console.error('Erro ao criar treino:', error)
@@ -71,7 +77,6 @@ export function CreateWorkout() {
 
       <div className="workout-builder">
         <form onSubmit={handleSubmit}>
-          {/* Header Info */}
           <div className="section">
             <h2>Informações do Treino</h2>
 
@@ -110,7 +115,6 @@ export function CreateWorkout() {
             </div>
           </div>
 
-          {/* Exercises */}
           <div className="section">
             <div className="section-header">
               <h2>Exercícios</h2>
@@ -182,3 +186,48 @@ export function CreateWorkout() {
                           onChange={(e) => updateExercise(idx, 'rest', parseInt(e.target.value))}
                           min="15"
                           max="300"
+                          step="15"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {formData.exercises.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeExercise(idx)}
+                      className="btn-remove-exercise"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="section preview-section">
+            <h2>Preview do Treino</h2>
+            <div className="preview">
+              <h3>{formData.name || 'Nome do Treino'}</h3>
+              <p>{formData.description || 'Sem descrição'}</p>
+              <div className="preview-meta">
+                <span>Dificuldade: {formData.difficulty}</span>
+                <span>Total de exercícios: {formData.exercises.length}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button type="button" onClick={() => navigate(-1)} className="btn-cancel">
+              Cancelar
+            </button>
+            <button type="submit" disabled={loading} className="btn-submit">
+              {loading ? 'Criando...' : 'Criar Treino'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
