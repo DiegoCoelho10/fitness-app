@@ -7,7 +7,7 @@ import './Layout.css'
 
 export function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { user, userRole, logout } = useAuthStore()
+  const { user, logout } = useAuthStore()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
