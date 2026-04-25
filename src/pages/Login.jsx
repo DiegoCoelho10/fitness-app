@@ -19,6 +19,7 @@ export function Login() {
   // Código de convite válido para Personal Trainers
   const VALID_INVITE_CODE = 'TRAINER2024'
 
+  // Este useEffect observa mudanças no user e navega automaticamente
   useEffect(() => {
     if (user) {
       navigate('/dashboard')
@@ -46,10 +47,9 @@ export function Login() {
       } else {
         await login(email, password)
       }
-      navigate('/dashboard')
+      // NÃO CHAMA navigate aqui! O useEffect vai fazer isso
     } catch (err) {
       setError(err.message || 'Erro ao autenticar')
-    } finally {
       setLoading(false)
     }
   }
@@ -146,7 +146,6 @@ export function Login() {
                   </select>
                 </div>
 
-                {/* Campo de Código de Convite - aparece só para Personal Trainer */}
                 {role === 'personal_trainer' && (
                   <div className="form-group">
                     <label htmlFor="inviteCode">Código de Convite</label>
