@@ -1,66 +1,142 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { useAuthStore } from '../context/authStore'
-import './Sidebar.css'
+.sidebar {
+  background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
+  color: white;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 200;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+}
 
-export function Sidebar({ isOpen, onClose }) {
-  const { userRole } = useAuthStore()
-  const location = useLocation()
+.sidebar-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 24px;
+}
 
-  const isActive = (path) => location.pathname === path
+.sidebar-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #E07800;
+  letter-spacing: 2px;
+}
 
-  const adminMenuItems = [
-    { path: '/dashboard', icon: '📊', label: 'Dashboard', exact: true },
-    { path: '/students', icon: '👥', label: 'Alunos' },
-    { path: '/workouts', icon: '💪', label: 'Treinos' },
-    { path: '/ranking', icon: '🏆', label: 'Ranking' },
-    { path: '/profile', icon: '⚙️', label: 'Perfil' },
-  ]
+.sidebar-role {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-  const studentMenuItems = [
-    { path: '/dashboard', icon: '📊', label: 'Home', exact: true },
-    { path: '/profile', icon: '👤', label: 'Meu Perfil' },
-  ]
+.sidebar-nav {
+  flex: 1;
+  padding: 0 12px;
+}
 
-  const menuItems = userRole === 'personal_trainer' ? adminMenuItems : studentMenuItems
+.nav-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-  return (
-    <>
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <h1>FIT</h1>
-          <p className="sidebar-role">
-            {userRole === 'personal_trainer' ? '💼 Trainer' : '💪 Aluno'}
-          </p>
-        </div>
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
 
-        <nav className="sidebar-nav">
-          <ul className="nav-menu">
-            {menuItems.map(item => (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
-                  onClick={onClose}
-                >
-                  <span className="nav-icon">{item.icon}</span>
-                  <span className="nav-label">{item.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+.nav-link:hover {
+  background: rgba(224, 120, 0, 0.1);
+  color: white;
+}
 
-        <div className="sidebar-footer">
-          <div className="footer-info">
-            <p className="footer-text">
-              {userRole === 'personal_trainer'
-                ? 'Gerencie seus alunos e treinos'
-                : 'Acompanhe seu progresso'}
-            </p>
-          </div>
-        </div>
-      </aside>
-    </>
-  )
+.nav-link.active {
+  background: linear-gradient(90deg, rgba(224, 120, 0, 0.2) 0%, transparent 100%);
+  color: #E07800;
+  border-left-color: #E07800;
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.nav-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sidebar-footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-info {
+  background: rgba(224, 120, 0, 0.1);
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 3px solid #E07800;
+}
+
+.footer-text {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 70px;
+    width: 280px;
+    height: calc(100vh - 70px);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+    z-index: 200;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(224, 120, 0, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(224, 120, 0, 0.5);
 }
