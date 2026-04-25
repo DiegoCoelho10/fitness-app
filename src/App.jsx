@@ -17,10 +17,12 @@ import './App.css'
 function App() {
   const { initAuth, user, loading } = useAuthStore()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    initAuth()
-  }, [])
+    const init = async () => {
+      await initAuth()
+    }
+    init()
+  }, [initAuth])
 
   if (loading) {
     return (
@@ -34,10 +36,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
-
-        {/* Protected Routes */}
         <Route
           path="/*"
           element={
