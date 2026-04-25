@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getWorkout, completeWorkout, addPoints, updateStreak, uploadProgressPhoto } from '../services/firebaseService'
+import { getWorkout, completeWorkout, addPoints, updateStreak } from '../services/firebaseService'
 import { PhotoUpload } from '../components/PhotoUpload'
 import './MyWorkout.css'
 
