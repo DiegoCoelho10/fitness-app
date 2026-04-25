@@ -6,7 +6,7 @@ import {
   signOut,
   onAuthStateChanged 
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 
 export const useAuthStore = create((set) => ({
   user: null,
