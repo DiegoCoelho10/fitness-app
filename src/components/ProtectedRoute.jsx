@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { useAuthStore } from '../context/authStore'
 
 export function ProtectedRoute({ children, requiredRole = null }) {
@@ -20,11 +19,7 @@ export function ProtectedRoute({ children, requiredRole = null }) {
   if (loading || !accessChecked) {
     return (
       <div className="loading-container">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          className="loading-spinner"
-        />
+        <div className="loading-spinner" />
         <p>Carregando...</p>
       </div>
     )
@@ -47,11 +42,7 @@ export function ProtectedRoute({ children, requiredRole = null }) {
 
 function SubscriptionExpired() {
   return (
-    <motion.div
-      className="subscription-expired"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
+    <div className="subscription-expired">
       <div className="expired-content">
         <div className="expired-icon">😢</div>
         <h1>Assinatura Expirada</h1>
@@ -72,7 +63,7 @@ function SubscriptionExpired() {
           </button>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -87,15 +78,18 @@ const styles = `
     background-color: var(--color-bg-primary);
     gap: var(--spacing-md);
   }
-
   .loading-spinner {
     width: 48px;
     height: 48px;
     border: 4px solid var(--color-border);
     border-top-color: var(--color-primary);
     border-radius: 50%;
+    animation: spin 2s linear infinite;
   }
-
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
   .subscription-expired {
     display: flex;
     align-items: center;
@@ -104,33 +98,27 @@ const styles = `
     background-color: var(--color-bg-primary);
     padding: var(--spacing-md);
   }
-
   .expired-content {
     text-align: center;
     max-width: 420px;
   }
-
   .expired-icon {
     font-size: 64px;
     margin-bottom: var(--spacing-lg);
   }
-
   .expired-content h1 {
     color: var(--color-danger);
     margin-bottom: var(--spacing-sm);
   }
-
   .expired-content p {
     color: var(--color-text-secondary);
     margin-bottom: var(--spacing-lg);
   }
-
   .expired-actions {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
   }
-
   .expired-actions button {
     width: 100%;
   }
