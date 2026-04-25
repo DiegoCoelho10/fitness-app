@@ -47,6 +47,7 @@ function App() {
                 <Routes>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/students" element={<ProtectedRoute role="personal_trainer"><Students /></ProtectedRoute>} />
+                  <Route path="/students/:studentId/workout/new" element={<ProtectedRoute role="personal_trainer"><CreateWorkout /></ProtectedRoute>} />
                   <Route path="/workouts" element={<ProtectedRoute role="personal_trainer"><Ranking /></ProtectedRoute>} />
                   <Route path="/chat/:studentId" element={<Chat />} />
                   <Route path="/workout/:workoutId" element={<MyWorkout />} />
