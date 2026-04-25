@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './context/authStore'
 import { Layout } from './components/Layout'
 import { ProtectedRoute } from './components/ProtectedRoute'
-
 // Pages
 import { Login } from './pages/Login'
 import { Dashboard } from './pages/Dashboard'
@@ -13,12 +12,12 @@ import { MyWorkout } from './pages/MyWorkout'
 import { Chat } from './pages/Chat'
 import { Profile } from './pages/Profile'
 import { Ranking } from './pages/Ranking'
-
 import './App.css'
 
 function App() {
   const { initAuth, user, loading } = useAuthStore()
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     initAuth()
   }, [])
