@@ -1,22 +1,37 @@
 import React, { useState, useEffect } from 'react'
 import { useAuthStore } from '../context/authStore'
-import { getTopStudents } from '../services/firebaseService'
+import { subscribeToRanking } from '../services/firebaseService'
 import './Ranking.css'
 
 export function Ranking() {
-  const { user } = useAuthStore()
-  const [students, setStudents] = useState([])
+  const { user, userRole } = useAuthStore()
+  const [ranking, setRanking] = useState([])
   const [loading, setLoading] = useState(true)
+  const [userRank, setUserRank] = useState(null)
 
   useEffect(() => {
-    const loadRanking = async () => {
-      const topStudents = await getTopStudents(user.uid, 50)
-      setStudents(topStudents)
+    if (!user || userRole !== 'personal_trainer') {
       setLoading(false)
+      return
     }
 
-    loadRanking()
-  }, [user.uid])
+    const unsubscribe = subscribeToRanking(user.uid, (alunosData) => {
+      setRanking(alunosData)
+      setLoading(false)
+    })
+
+    return unsubscribe
+  }, [user, userRole])
+
+  if (userRole !== 'personal_trainer') {
+    return (
+      <div className="ranking-page">
+        <div className="empty-state">
+          <p>Apenas personal trainers podem ver o ranking</p>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return <div className="ranking-loading">Carregando ranking...</div>
@@ -26,56 +41,64 @@ export function Ranking() {
     <div className="ranking-page">
       <div className="ranking-header">
         <h1>🏆 Ranking de Alunos</h1>
-        <p>Veja os melhores desempenhos</p>
+        <p>Veja os melhores desempenhos da sua turma</p>
       </div>
 
-      {students.length === 0 ? (
+      {ranking.length === 0 ? (
         <div className="empty-state">
           <p>Nenhum aluno adicionado ainda</p>
         </div>
       ) : (
         <div className="ranking-container">
           {/* Top 3 Podium */}
-          <div className="podium">
-            {students[1] && (
-              <div className="podium-item silver">
-                <div className="medal">🥈</div>
-                <img
-                  src={students[1].profile?.photo || ''}
-                  alt={students[1].name}
-                  className="podium-photo"
-                />
-                <h3>{students[1].name}</h3>
-                <div className="podium-points">{students[1].gamification?.points || 0} pts</div>
-              </div>
-            )}
+          {ranking.length >= 3 && (
+            <div className="podium">
+              {ranking[1] && (
+                <div className="podium-item silver">
+                  <div className="medal">🥈</div>
+                  <img
+                    src={ranking[1].profilePhoto || '/placeholder.jpg'}
+                    alt={ranking[1].name}
+                    className="podium-photo"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                  <div className="podium-placeholder">👤</div>
+                  <h3>{ranking[1].name}</h3>
+                  <div className="podium-points">{ranking[1].gamification?.totalPoints || 0} pts</div>
+                </div>
+              )}
 
-            {students[0] && (
-              <div className="podium-item gold">
-                <div className="medal">🥇</div>
-                <img
-                  src={students[0].profile?.photo || ''}
-                  alt={students[0].name}
-                  className="podium-photo"
-                />
-                <h3>{students[0].name}</h3>
-                <div className="podium-points">{students[0].gamification?.points || 0} pts</div>
-              </div>
-            )}
+              {ranking[0] && (
+                <div className="podium-item gold">
+                  <div className="medal">🥇</div>
+                  <img
+                    src={ranking[0].profilePhoto || '/placeholder.jpg'}
+                    alt={ranking[0].name}
+                    className="podium-photo"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                  <div className="podium-placeholder">👤</div>
+                  <h3>{ranking[0].name}</h3>
+                  <div className="podium-points">{ranking[0].gamification?.totalPoints || 0} pts</div>
+                </div>
+              )}
 
-            {students[2] && (
-              <div className="podium-item bronze">
-                <div className="medal">🥉</div>
-                <img
-                  src={students[2].profile?.photo || ''}
-                  alt={students[2].name}
-                  className="podium-photo"
-                />
-                <h3>{students[2].name}</h3>
-                <div className="podium-points">{students[2].gamification?.points || 0} pts</div>
-              </div>
-            )}
-          </div>
+              {ranking[2] && (
+                <div className="podium-item bronze">
+                  <div className="medal">🥉</div>
+                  <img
+                    src={ranking[2].profilePhoto || '/placeholder.jpg'}
+                    alt={ranking[2].name}
+                    className="podium-photo"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                  <div className="podium-placeholder">👤</div>
+                  <h3>{ranking[2].name}</h3>
+                  <div className="podium-points">{ranking[2].gamification?.totalPoints || 0} pts</div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Full Ranking List */}
           <div className="ranking-list">
@@ -87,44 +110,44 @@ export function Ranking() {
               <div className="col-stat">Sequência</div>
             </div>
 
-            {students.map((student, idx) => (
-              <div key={student.id} className="ranking-item">
+            {ranking.map((aluno, idx) => (
+              <div key={aluno.id} className="ranking-item">
                 <div className="col-rank">
                   <span className="rank-badge">#{idx + 1}</span>
                 </div>
 
                 <div className="col-name">
-                  <div className="student-info-compact">
-                    {student.profile?.photo ? (
-                      <img src={student.profile.photo} alt={student.name} className="mini-avatar" />
+                  <div className="student-info">
+                    {aluno.profilePhoto ? (
+                      <img src={aluno.profilePhoto} alt={aluno.name} className="mini-avatar" />
                     ) : (
                       <div className="mini-avatar-placeholder">👤</div>
                     )}
                     <div className="name-info">
-                      <p className="name">{student.name}</p>
-                      <p className="goal">{student.goal || 'Sem objetivo'}</p>
+                      <p className="name">{aluno.name}</p>
+                      <p className="goal">{aluno.goal || 'Sem objetivo'}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="col-stat">
                   <div className="stat-badge">
-                    <span className="icon">💪</span>
-                    {student.gamification?.totalWorkouts || 0}
+                    <span>💪</span>
+                    {aluno.gamification?.totalWorkouts || 0}
                   </div>
                 </div>
 
                 <div className="col-stat">
                   <div className="stat-badge points">
-                    <span className="icon">⭐</span>
-                    {student.gamification?.points || 0}
+                    <span>⭐</span>
+                    {aluno.gamification?.totalPoints || 0}
                   </div>
                 </div>
 
                 <div className="col-stat">
                   <div className="stat-badge streak">
-                    <span className="icon">🔥</span>
-                    {student.gamification?.streak || 0}
+                    <span>🔥</span>
+                    {aluno.gamification?.streak || 0}
                   </div>
                 </div>
               </div>
@@ -133,7 +156,7 @@ export function Ranking() {
 
           {/* Badges Legend */}
           <div className="badges-legend">
-            <h3>Conquistas Disponíveis</h3>
+            <h3>🏅 Badges Disponíveis</h3>
             <div className="badges-grid">
               <div className="badge-info">
                 <span>🥇</span>
@@ -141,11 +164,11 @@ export function Ranking() {
               </div>
               <div className="badge-info">
                 <span>🔥</span>
-                <p>Semana Consistente</p>
+                <p>7 Dias de Fogo</p>
               </div>
               <div className="badge-info">
                 <span>💪</span>
-                <p>Mês de Sequência</p>
+                <p>30 Dias Consistente</p>
               </div>
               <div className="badge-info">
                 <span>⭐</span>
@@ -153,7 +176,7 @@ export function Ranking() {
               </div>
               <div className="badge-info">
                 <span>📸</span>
-                <p>Photo Upload</p>
+                <p>Foto de Progresso</p>
               </div>
             </div>
           </div>
