@@ -1,72 +1,82 @@
 import React, { useState, useEffect } from 'react'
+import { useAuthStore } from '../context/authStore'
 import { subscribeToNotifications, markNotificationAsRead } from '../services/firebaseService'
 import './NotificationCenter.css'
 
-export function NotificationCenter({ userId }) {
+export function NotificationCenter() {
+  const { user } = useAuthStore()
   const [notifications, setNotifications] = useState([])
-  const [isOpen, setIsOpen] = useState(false)
-  const unreadCount = notifications.filter(n => !n.read).length
+  const [showPanel, setShowPanel] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
-    const unsubscribe = subscribeToNotifications(userId, (snapshot) => {
-      const notifs = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate?.() || new Date()
-      }))
-      setNotifications(notifs)
+    if (!user) return
+
+    const unsubscribe = subscribeToNotifications(user.uid, (notificationsData) => {
+      setNotifications(notificationsData)
+      setUnreadCount(notificationsData.filter(n => !n.read).length)
     })
 
     return unsubscribe
-  }, [userId])
+  }, [user])
 
-  const handleNotificationClick = async (notificationId) => {
-    await markNotificationAsRead(userId, notificationId)
-  }
-
-  const getIcon = (type) => {
-    const icons = {
-      workout: '💪',
-      message: '💬',
-      achievement: '🏆',
-      reminder: '⏰',
-      default: '📢'
+  const handleNotificationClick = async (notification) => {
+    if (!notification.read) {
+      await markNotificationAsRead(user.uid, notification.id)
     }
-    return icons[type] || icons.default
   }
 
   return (
     <div className="notification-center">
-      <button className="notification-bell" onClick={() => setIsOpen(!isOpen)}>
-        🔔
-        {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
+      <button
+        onClick={() => setShowPanel(!showPanel)}
+        className="notification-bell"
+      >
+        <span className="bell-icon">🔔</span>
+        {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
       </button>
 
-      {isOpen && (
+      {showPanel && (
         <div className="notification-panel">
-          <div className="notification-header">
+          <div className="panel-header">
             <h3>Notificações</h3>
-            <button onClick={() => setIsOpen(false)}>✕</button>
+            <button
+              onClick={() => setShowPanel(false)}
+              className="btn-close"
+            >
+              ✕
+            </button>
           </div>
 
-          <div className="notification-list">
+          <div className="notifications-list">
             {notifications.length === 0 ? (
-              <div className="empty-state">
-                <p>Nenhuma notificação</p>
-              </div>
+              <p className="empty-notif">Nenhuma notificação</p>
             ) : (
-              notifications.map(notif => (
+              notifications.slice(0, 10).map(notif => (
                 <div
                   key={notif.id}
-                  className={`notification-item ${notif.read ? 'read' : 'unread'}`}
-                  onClick={() => handleNotificationClick(notif.id)}
+                  className={`notification-item ${!notif.read ? 'unread' : ''}`}
+                  onClick={() => handleNotificationClick(notif)}
                 >
-                  <span className="notification-icon">{getIcon(notif.type)}</span>
-                  <div className="notification-content">
-                    <h4>{notif.title}</h4>
-                    <p>{notif.body}</p>
-                    <small>{notif.timestamp.toLocaleString('pt-BR')}</small>
+                  <div className="notif-icon">
+                    {notif.type === 'workout' && '💪'}
+                    {notif.type === 'diet' && '🥗'}
+                    {notif.type === 'achievement' && '🏆'}
+                    {notif.type === 'message' && '💬'}
                   </div>
+
+                  <div className="notif-content">
+                    <p className="notif-title">{notif.title}</p>
+                    <small className="notif-body">{notif.body}</small>
+                    <small className="notif-time">
+                      {notif.timestamp.toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </small>
+                  </div>
+
+                  {!notif.read && <div className="unread-dot"></div>}
                 </div>
               ))
             )}
