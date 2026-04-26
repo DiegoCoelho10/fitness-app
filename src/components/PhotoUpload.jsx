@@ -1,30 +1,18 @@
 import React, { useState } from 'react'
-import { uploadProfilePhoto } from '../services/firebaseService'
+import { uploadProgressPhoto } from '../services/firebaseService'
 import './PhotoUpload.css'
 
 export function PhotoUpload({ userId, onPhotoUploaded }) {
+  const [uploading, setUploading] = useState(false)
   const [preview, setPreview] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0]
     if (!file) return
 
-    if (!file.type.startsWith('image/')) {
-      setError('Por favor, selecione uma imagem')
-      return
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Imagem deve ser menor que 5MB')
-      return
-    }
-
     const reader = new FileReader()
     reader.onload = (event) => {
       setPreview(event.target.result)
-      setError('')
     }
     reader.readAsDataURL(file)
   }
@@ -32,53 +20,59 @@ export function PhotoUpload({ userId, onPhotoUploaded }) {
   const handleUpload = async () => {
     if (!preview) return
 
-    setLoading(true)
+    setUploading(true)
     try {
-      const file = await fetch(preview)
-        .then(res => res.blob())
-        .then(blob => new File([blob], 'profile.jpg', { type: 'image/jpeg' }))
-
-      const url = await uploadProfilePhoto(userId, file)
-      onPhotoUploaded(url)
+      // Converter preview data URL para Blob
+      const response = await fetch(preview)
+      const blob = await response.blob()
+      
+      await uploadProgressPhoto(userId, blob)
+      alert('Foto de progresso salva com sucesso!')
       setPreview(null)
-    } catch (err) {
-      setError('Erro ao enviar foto: ' + err.message)
+      onPhotoUploaded()
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error)
+      alert('Erro ao fazer upload: ' + error.message)
     } finally {
-      setLoading(false)
+      setUploading(false)
     }
   }
 
   return (
-    <div className="photo-upload">
-      <label className="upload-area">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          disabled={loading}
-        />
-        {preview ? (
-          <div className="preview">
-            <img src={preview} alt="Preview" />
-          </div>
-        ) : (
-          <div className="upload-placeholder">
-            <span className="upload-icon">📸</span>
-            <p>Clique ou arraste uma foto</p>
-          </div>
-        )}
-      </label>
+    <div className="photo-upload-container">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+        id="photo-input"
+        className="photo-input"
+      />
 
-      {error && <div className="error-message">{error}</div>}
-
-      {preview && (
-        <div className="upload-actions">
-          <button onClick={handleUpload} disabled={loading} className="btn-upload">
-            {loading ? 'Enviando...' : 'Enviar Foto'}
-          </button>
-          <button onClick={() => setPreview(null)} className="btn-cancel">
-            Cancelar
-          </button>
+      {!preview ? (
+        <label htmlFor="photo-input" className="upload-zone">
+          <div className="upload-icon">📷</div>
+          <p className="upload-text">Clique para selecionar uma foto</p>
+          <small>JPG, PNG (máx 5MB)</small>
+        </label>
+      ) : (
+        <div className="preview-container">
+          <img src={preview} alt="preview" className="preview-image" />
+          <div className="preview-actions">
+            <button
+              onClick={handleUpload}
+              disabled={uploading}
+              className="btn-confirm"
+            >
+              {uploading ? 'Enviando...' : '✓ Confirmar'}
+            </button>
+            <button
+              onClick={() => setPreview(null)}
+              disabled={uploading}
+              className="btn-cancel"
+            >
+              ✕ Cancelar
+            </button>
+          </div>
         </div>
       )}
     </div>
