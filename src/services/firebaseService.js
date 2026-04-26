@@ -1,8 +1,7 @@
-import { db, storage, auth } from '../services/firebaseConfig'
+import { db, storage } from '../services/firebaseConfig'
 import { 
   collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, 
-  query, where, orderBy, onSnapshot, addDoc, serverTimestamp,
-  writeBatch, increment
+  query, where, orderBy, onSnapshot, addDoc, serverTimestamp
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 
@@ -179,7 +178,7 @@ export const createExercise = async (exerciseData) => {
     const docRef = await addDoc(collection(db, 'exercicios'), {
       name: exerciseData.name,
       description: exerciseData.description || '',
-      category: exerciseData.category, // peito, costa, perna, braço, ombro, etc
+      category: exerciseData.category,
       imageUrl: exerciseData.imageUrl || '',
       videoUrl: exerciseData.videoUrl || '',
       instructions: exerciseData.instructions || '',
@@ -232,7 +231,7 @@ export const createTreino = async (personalTrainerId, alunoId, treinoData) => {
       name: treinoData.name,
       description: treinoData.description || '',
       difficulty: treinoData.difficulty || 'moderado',
-      exercises: treinoData.exercises, // Array de objetos: {exerciseId, series, reps, weight, rest, notes}
+      exercises: treinoData.exercises,
       startDate: serverTimestamp(),
       endDate: treinoData.endDate || null,
       status: 'active',
@@ -240,7 +239,6 @@ export const createTreino = async (personalTrainerId, alunoId, treinoData) => {
       updatedAt: serverTimestamp()
     })
     
-    // Enviar notificação para o aluno
     await sendNotification(alunoId, {
       type: 'workout',
       title: 'Novo Treino Atribuído! 💪',
@@ -331,13 +329,9 @@ export const completeWorkout = async (alunoId, treinoId, completionData) => {
       completed_at: serverTimestamp()
     })
 
-    // Adicionar pontos
     await addPoints(alunoId, 100, 'workout_completed')
-    
-    // Atualizar streak
     await updateStreak(alunoId)
     
-    // Atualizar total de treinos
     const aluno = await getAluno(alunoId)
     await updateAluno(alunoId, {
       'gamification.totalWorkouts': (aluno.gamification?.totalWorkouts || 0) + 1
@@ -375,15 +369,14 @@ export const createDieta = async (personalTrainerId, alunoId, dietaData) => {
     const docRef = await addDoc(collection(db, 'dietas'), {
       personalTrainerId,
       alunoId,
-      objetivo: dietaData.objetivo, // ganhar, perder, manter
-      refeicoes: dietaData.refeicoes, // Array: {nome, alimentos, calorias, horario}
+      objetivo: dietaData.objetivo,
+      refeicoes: dietaData.refeicoes,
       notas: dietaData.notas || '',
       startDate: serverTimestamp(),
       status: 'active',
       createdAt: serverTimestamp()
     })
 
-    // Notificar aluno
     await sendNotification(alunoId, {
       type: 'diet',
       title: 'Nova Dieta! 🥗',
@@ -421,299 +414,4 @@ export const updateDieta = async (dietaId, data) => {
   try {
     await updateDoc(doc(db, 'dietas', dietaId), data)
   } catch (error) {
-    console.error('Erro ao atualizar dieta:', error)
-    throw error
-  }
-}
-
-// ====== CHAT ======
-export const getOrCreateConversation = async (userId1, userId2) => {
-  try {
-    const conversationId = [userId1, userId2].sort().join('_')
-    const docRef = doc(db, 'chats', conversationId)
-    const docSnap = await getDoc(docRef)
-    
-    if (!docSnap.exists()) {
-      await setDoc(docRef, {
-        participants: [userId1, userId2],
-        createdAt: serverTimestamp(),
-        lastMessage: '',
-        lastMessageTime: serverTimestamp()
-      })
-    }
-    
-    return conversationId
-  } catch (error) {
-    console.error('Erro ao criar conversa:', error)
-    throw error
-  }
-}
-
-export const sendMessage = async (conversationId, senderId, text) => {
-  try {
-    const messagesRef = collection(db, 'chats', conversationId, 'messages')
-    await addDoc(messagesRef, {
-      senderId,
-      text,
-      timestamp: serverTimestamp(),
-      read: false
-    })
-
-    // Atualizar último mensagem na conversa
-    await updateDoc(doc(db, 'chats', conversationId), {
-      lastMessage: text,
-      lastMessageTime: serverTimestamp()
-    })
-  } catch (error) {
-    console.error('Erro ao enviar mensagem:', error)
-    throw error
-  }
-}
-
-export const subscribeToChat = (conversationId, callback) => {
-  try {
-    const q = query(
-      collection(db, 'chats', conversationId, 'messages'),
-      orderBy('timestamp', 'asc')
-    )
-    return onSnapshot(q, (snapshot) => {
-      const messages = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate?.() || new Date()
-      }))
-      callback(messages)
-    }, (error) => {
-      console.error('Erro ao buscar mensagens:', error)
-      callback([])
-    })
-  } catch (error) {
-    console.error('Erro na subscription chat:', error)
-  }
-}
-
-// ====== NOTIFICAÇÕES ======
-export const sendNotification = async (userId, notification) => {
-  try {
-    const notificationsRef = collection(db, 'notifications', userId, 'items')
-    await addDoc(notificationsRef, {
-      type: notification.type,
-      title: notification.title,
-      body: notification.body,
-      actionUrl: notification.actionUrl || '',
-      timestamp: serverTimestamp(),
-      read: false
-    })
-  } catch (error) {
-    console.error('Erro ao enviar notificação:', error)
-    throw error
-  }
-}
-
-export const subscribeToNotifications = (userId, callback) => {
-  try {
-    const q = query(
-      collection(db, 'notifications', userId, 'items'),
-      orderBy('timestamp', 'desc')
-    )
-    return onSnapshot(q, (snapshot) => {
-      const notifications = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate?.() || new Date()
-      }))
-      callback(notifications)
-    }, (error) => {
-      console.error('Erro ao buscar notificações:', error)
-      callback([])
-    })
-  } catch (error) {
-    console.error('Erro na subscription notificações:', error)
-  }
-}
-
-export const markNotificationAsRead = async (userId, notificationId) => {
-  try {
-    await updateDoc(doc(db, 'notifications', userId, 'items', notificationId), {
-      read: true
-    })
-  } catch (error) {
-    console.error('Erro ao marcar notificação:', error)
-  }
-}
-
-// ====== FOTOS ======
-export const uploadProfilePhoto = async (userId, file, userType = 'user') => {
-  try {
-    const storageRef = ref(storage, `${userType}s/${userId}/profile`)
-    
-    // Delete existing photo if exists
-    try {
-      await deleteObject(storageRef)
-    } catch (e) {
-      // Photo doesn't exist, that's fine
-    }
-
-    await uploadBytes(storageRef, file)
-    const url = await getDownloadURL(storageRef)
-
-    if (userType === 'user') {
-      await updatePersonalTrainer(userId, { profilePhoto: url })
-    } else {
-      await updateAluno(userId, { profilePhoto: url })
-    }
-
-    return url
-  } catch (error) {
-    console.error('Erro ao fazer upload de foto:', error)
-    throw error
-  }
-}
-
-export const uploadProgressPhoto = async (alunoId, file) => {
-  try {
-    const timestamp = Date.now()
-    const storageRef = ref(storage, `progress/${alunoId}/${timestamp}`)
-    await uploadBytes(storageRef, file)
-    const url = await getDownloadURL(storageRef)
-    
-    return url
-  } catch (error) {
-    console.error('Erro ao fazer upload de foto de progresso:', error)
-    throw error
-  }
-}
-
-// ====== GAMIFICAÇÃO ======
-export const addPoints = async (alunoId, points, reason) => {
-  try {
-    // Registrar transação de pontos
-    await addDoc(collection(db, 'pontos'), {
-      alunoId,
-      points,
-      reason,
-      timestamp: serverTimestamp()
-    })
-
-    // Atualizar total de pontos do aluno
-    const aluno = await getAluno(alunoId)
-    const currentPoints = aluno.gamification?.totalPoints || 0
-    
-    await updateAluno(alunoId, {
-      'gamification.totalPoints': currentPoints + points,
-      'gamification.points': currentPoints + points
-    })
-  } catch (error) {
-    console.error('Erro ao adicionar pontos:', error)
-    throw error
-  }
-}
-
-export const updateStreak = async (alunoId) => {
-  try {
-    const today = new Date().toDateString()
-    const aluno = await getAluno(alunoId)
-    const lastCheckIn = aluno.gamification?.lastCheckIn
-
-    if (lastCheckIn !== today) {
-      const currentStreak = aluno.gamification?.streak || 0
-      
-      await updateAluno(alunoId, {
-        'gamification.lastCheckIn': today,
-        'gamification.streak': currentStreak + 1
-      })
-
-      // Bonus pontos por streak
-      if ((currentStreak + 1) % 7 === 0) {
-        await addPoints(alunoId, 100, 'streak_weekly')
-      }
-      if ((currentStreak + 1) % 30 === 0) {
-        await addPoints(alunoId, 500, 'streak_monthly')
-      }
-    }
-  } catch (error) {
-    console.error('Erro ao atualizar streak:', error)
-    throw error
-  }
-}
-
-export const unlockBadge = async (alunoId, badgeId) => {
-  try {
-    const aluno = await getAluno(alunoId)
-    const badges = aluno.gamification?.badges || []
-    
-    if (!badges.includes(badgeId)) {
-      await updateAluno(alunoId, {
-        'gamification.badges': [...badges, badgeId]
-      })
-
-      await addPoints(alunoId, 50, `badge_unlocked_${badgeId}`)
-    }
-  } catch (error) {
-    console.error('Erro ao desbloquear badge:', error)
-    throw error
-  }
-}
-
-// ====== RANKING ======
-export const getTopAlunosByTrainer = async (personalTrainerId, limit = 50) => {
-  try {
-    const q = query(
-      collection(db, 'alunos'),
-      where('personalTrainerId', '==', personalTrainerId),
-      orderBy('gamification.totalPoints', 'desc')
-    )
-    const snapshot = await getDocs(q)
-    return snapshot.docs.slice(0, limit).map((doc, index) => ({
-      id: doc.id,
-      ...doc.data(),
-      rank: index + 1
-    }))
-  } catch (error) {
-    console.error('Erro ao buscar ranking:', error)
-    throw error
-  }
-}
-
-export const subscribeToRanking = (personalTrainerId, callback) => {
-  try {
-    const q = query(
-      collection(db, 'alunos'),
-      where('personalTrainerId', '==', personalTrainerId),
-      orderBy('gamification.totalPoints', 'desc')
-    )
-    return onSnapshot(q, (snapshot) => {
-      const alunos = snapshot.docs.map((doc, index) => ({
-        id: doc.id,
-        ...doc.data(),
-        rank: index + 1
-      }))
-      callback(alunos)
-    }, (error) => {
-      console.error('Erro ao buscar ranking:', error)
-      callback([])
-    })
-  } catch (error) {
-    console.error('Erro na subscription ranking:', error)
-  }
-}
-
-// ====== ANALYTICS / RELATÓRIOS ======
-export const getAlunoProgress = async (alunoId) => {
-  try {
-    const aluno = await getAluno(alunoId)
-    const workoutsCompleted = await getWorkoutsCompleted(alunoId)
-    
-    return {
-      aluno,
-      totalWorkouts: workoutsCompleted.length,
-      lastWorkout: workoutsCompleted[0] || null,
-      streakDays: aluno.gamification?.streak || 0,
-      totalPoints: aluno.gamification?.totalPoints || 0,
-      badges: aluno.gamification?.badges || []
-    }
-  } catch (error) {
-    console.error('Erro ao buscar progresso:', error)
-    throw error
-  }
-}
+    console.error('Erro a
