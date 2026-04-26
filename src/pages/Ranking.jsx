@@ -7,7 +7,6 @@ export function Ranking() {
   const { user, userRole } = useAuthStore()
   const [ranking, setRanking] = useState([])
   const [loading, setLoading] = useState(true)
-  const [userRank, setUserRank] = useState(null)
 
   useEffect(() => {
     if (!user || userRole !== 'personal_trainer') {
