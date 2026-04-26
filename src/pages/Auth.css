@@ -187,7 +187,6 @@
   overflow-x: auto;
 }
 
-/* Responsividade */
 @media (max-width: 480px) {
   .auth-card {
     border-radius: 16px;
@@ -208,9 +207,5 @@
   .auth-tabs {
     margin: 0 -20px;
     border-radius: 0;
-  }
-
-  .celebration {
-    padding: 30px 20px;
   }
 }
