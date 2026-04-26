@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getWorkout, completeWorkout, addPoints, updateStreak } from '../services/firebaseService'
+import { getTreino, completeWorkout, addPoints, updateStreak } from '../services/firebaseService'
 import { PhotoUpload } from '../components/PhotoUpload'
 import './MyWorkout.css'
 
@@ -17,10 +17,20 @@ export function MyWorkout() {
   const [completed, setCompleted] = useState(false)
 
   useEffect(() => {
-    getWorkout(workoutId).then(data => {
-      setWorkout(data)
-      setLoading(false)
-    })
+    const loadWorkout = async () => {
+      try {
+        const data = await getTreino(workoutId)
+        if (data) {
+          setWorkout(data)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar treino:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadWorkout()
   }, [workoutId])
 
   useEffect(() => {
@@ -42,13 +52,15 @@ export function MyWorkout() {
   if (!workout) return <div className="error">Treino não encontrado</div>
 
   const currentExercise = workout.exercises[currentExerciseIdx]
+  if (!currentExercise) return <div className="error">Exercício não encontrado</div>
+
   const progress = exerciseProgress[currentExerciseIdx] || {
     sets: 0,
     reps: 0,
-    weight: currentExercise.weight
+    weight: currentExercise.weight || ''
   }
 
-  const handleExerciseComplete = () => {
+  const handleExerciseComplete = async () => {
     setExerciseProgress({
       ...exerciseProgress,
       [currentExerciseIdx]: progress
@@ -67,14 +79,18 @@ export function MyWorkout() {
   }
 
   const handleWorkoutComplete = async () => {
-    await completeWorkout(workoutId, {
-      exercises: exerciseProgress,
-      duration: 0,
-      notes: ''
-    })
+    try {
+      await completeWorkout(workout.alunoId, workout.id, {
+        exercises_done: exerciseProgress,
+        duration: 0,
+        notes: ''
+      })
 
-    await addPoints(workout.studentId, 50, 'workout_completed')
-    await updateStreak(workout.studentId)
+      await addPoints(workout.alunoId, 100, 'workout_completed')
+      await updateStreak(workout.alunoId)
+    } catch (error) {
+      console.error('Erro ao completar treino:', error)
+    }
   }
 
   const incrementSet = () => {
@@ -110,7 +126,7 @@ export function MyWorkout() {
           <p>Você completou o treino!</p>
           <div className="points-earned">
             <span className="icon">⭐</span>
-            <span className="value">+50 Pontos</span>
+            <span className="value">+100 Pontos</span>
           </div>
           <button onClick={() => navigate('/dashboard')} className="btn-back-home">
             Voltar ao Dashboard
@@ -173,6 +189,7 @@ export function MyWorkout() {
                   <p className="counter-label">Séries Feitas</p>
                   <div className="counter">
                     <button
+                      type="button"
                       onClick={() => setExerciseProgress({
                         ...exerciseProgress,
                         [currentExerciseIdx]: {
@@ -184,7 +201,7 @@ export function MyWorkout() {
                       −
                     </button>
                     <div className="counter-display">{progress.sets}</div>
-                    <button onClick={incrementSet}>+</button>
+                    <button type="button" onClick={incrementSet}>+</button>
                   </div>
                 </div>
 
@@ -192,6 +209,7 @@ export function MyWorkout() {
                   <p className="counter-label">Repetições Feitas</p>
                   <div className="counter">
                     <button
+                      type="button"
                       onClick={() => setExerciseProgress({
                         ...exerciseProgress,
                         [currentExerciseIdx]: {
@@ -203,26 +221,28 @@ export function MyWorkout() {
                       −
                     </button>
                     <div className="counter-display">{progress.reps}</div>
-                    <button onClick={incrementReps}>+</button>
+                    <button type="button" onClick={incrementReps}>+</button>
                   </div>
                 </div>
               </div>
 
-              {/* Photo Upload for Exercise */}
+              {/* Photo Upload */}
               <div className="exercise-photo">
                 <button
+                  type="button"
                   onClick={() => setShowPhotoUpload(!showPhotoUpload)}
                   className="btn-photo"
                 >
                   📸 Tirar Foto do Exercício
                 </button>
                 {showPhotoUpload && (
-                  <PhotoUpload userId={workout.studentId} onPhotoUploaded={() => setShowPhotoUpload(false)} />
+                  <PhotoUpload userId={workout.alunoId} onPhotoUploaded={() => setShowPhotoUpload(false)} />
                 )}
               </div>
 
               {/* Complete Exercise Button */}
               <button
+                type="button"
                 onClick={handleExerciseComplete}
                 className="btn-complete-exercise"
               >
@@ -235,7 +255,7 @@ export function MyWorkout() {
         </div>
       </div>
 
-      {/* Sidebar with Exercise List */}
+      {/* Sidebar */}
       <div className="exercises-sidebar">
         <h3>Exercícios</h3>
         <div className="exercises-list">
