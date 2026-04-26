@@ -4,20 +4,13 @@ import './ChatBox.css'
 
 export function ChatBox({ conversationId, userId, otherUserName }) {
   const [messages, setMessages] = useState([])
-  const [newMessage, setNewMessage] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+  const [sending, setSending] = useState(false)
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
-    if (!conversationId) return
-    
-    const unsubscribe = subscribeToChat(conversationId, (snapshot) => {
-      const msgs = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate?.() || new Date()
-      }))
-      setMessages(msgs)
+    const unsubscribe = subscribeToChat(conversationId, (messagesData) => {
+      setMessages(messagesData)
       scrollToBottom()
     })
 
@@ -25,49 +18,50 @@ export function ChatBox({ conversationId, userId, otherUserName }) {
   }, [conversationId])
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
   }
 
   const handleSendMessage = async (e) => {
     e.preventDefault()
-    if (!newMessage.trim()) return
 
-    setLoading(true)
+    if (!inputValue.trim()) return
+
+    setSending(true)
     try {
-      await sendMessage(conversationId, userId, newMessage)
-      setNewMessage('')
+      await sendMessage(conversationId, userId, inputValue.trim())
+      setInputValue('')
+      scrollToBottom()
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error)
+      alert('Erro ao enviar mensagem')
     } finally {
-      setLoading(false)
+      setSending(false)
     }
   }
 
   return (
-    <div className="chatbox">
-      <div className="chatbox-header">
-        <h3>{otherUserName}</h3>
-      </div>
-
-      <div className="chatbox-messages">
+    <div className="chatbox-container">
+      <div className="messages-container">
         {messages.length === 0 ? (
-          <div className="no-messages">
-            <p>Nenhuma mensagem ainda. Comece a conversa!</p>
+          <div className="empty-chat">
+            <p>Nenhuma mensagem ainda. Comece uma conversa! 💬</p>
           </div>
         ) : (
-          messages.map(msg => (
+          messages.map(message => (
             <div
-              key={msg.id}
-              className={`message ${msg.senderId === userId ? 'sent' : 'received'}`}
+              key={message.id}
+              className={`message ${message.senderId === userId ? 'own' : 'other'}`}
             >
               <div className="message-content">
-                <p>{msg.text}</p>
-                <span className="message-time">
-                  {msg.timestamp.toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
+                <p>{message.text}</p>
+                <small className="message-time">
+                  {message.timestamp.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
                   })}
-                </span>
+                </small>
               </div>
             </div>
           ))
@@ -75,16 +69,21 @@ export function ChatBox({ conversationId, userId, otherUserName }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} className="chatbox-input">
+      <form onSubmit={handleSendMessage} className="message-input-form">
         <input
           type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Digite sua mensagem..."
-          disabled={loading}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Digite uma mensagem..."
+          disabled={sending}
+          className="message-input"
         />
-        <button type="submit" disabled={loading || !newMessage.trim()}>
-          📤
+        <button
+          type="submit"
+          disabled={sending || !inputValue.trim()}
+          className="btn-send"
+        >
+          {sending ? '...' : '➤'}
         </button>
       </form>
     </div>
