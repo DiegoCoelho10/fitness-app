@@ -7,7 +7,7 @@ import './Layout.css'
 export function Layout({ children }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, userRole, logout } = useAuthStore()
+  const { userRole, logout } = useAuthStore()
 
   const handleLogout = () => {
     if (window.confirm('Tem certeza que deseja sair?')) {
