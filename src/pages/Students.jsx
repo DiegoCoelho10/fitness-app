@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import { useAuthStore } from '../context/authStore'
-import { getStudentsByTrainer, addStudent, updateStudent, deleteStudent } from '../services/firebaseService'
+import { getAlunosByTrainer, createAluno, updateAluno, deleteAluno } from '../services/firebaseService'
 import './Students.css'
 
 export function Students() {
   const { user } = useAuthStore()
-  const [students, setStudents] = useState([])
+  const [alunos, setAlunos] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     goal: '',
-    level: 'iniciante'
+    height: '',
+    weight: '',
+    dateOfBirth: '',
+    gender: ''
   })
-  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const unsubscribe = getStudentsByTrainer(user.uid, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
-      setStudents(docs)
+    const unsubscribe = getAlunosByTrainer(user.uid, (alunosData) => {
+      setAlunos(alunosData)
     })
     return unsubscribe
   }, [user.uid])
@@ -33,35 +33,72 @@ export function Students() {
 
     try {
       if (editingId) {
-        await updateStudent(editingId, formData)
+        await updateAluno(editingId, {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          goal: formData.goal,
+          'measurements.height': parseFloat(formData.height) || 0,
+          'measurements.weight': parseFloat(formData.weight) || 0,
+          dateOfBirth: formData.dateOfBirth,
+          gender: formData.gender
+        })
       } else {
-        await addStudent(user.uid, formData)
+        await createAluno(user.uid, {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          goal: formData.goal,
+          height: parseFloat(formData.height) || 0,
+          weight: parseFloat(formData.weight) || 0,
+          dateOfBirth: formData.dateOfBirth,
+          gender: formData.gender
+        })
       }
-      setFormData({ name: '', email: '', goal: '', level: 'iniciante' })
+      
+      resetForm()
       setShowForm(false)
-      setEditingId(null)
     } catch (error) {
       console.error('Erro:', error)
+      alert('Erro ao salvar aluno: ' + error.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDelete = async (studentId) => {
-    if (window.confirm('Tem certeza que deseja deletar este aluno?')) {
-      await deleteStudent(studentId)
-    }
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      goal: '',
+      height: '',
+      weight: '',
+      dateOfBirth: '',
+      gender: ''
+    })
+    setEditingId(null)
   }
 
-  const handleEdit = (student) => {
+  const handleEdit = (aluno) => {
     setFormData({
-      name: student.name,
-      email: student.email,
-      goal: student.goal || '',
-      level: student.level || 'iniciante'
+      name: aluno.name,
+      email: aluno.email,
+      phone: aluno.phone || '',
+      goal: aluno.goal || '',
+      height: aluno.measurements?.height || '',
+      weight: aluno.measurements?.weight || '',
+      dateOfBirth: aluno.dateOfBirth || '',
+      gender: aluno.gender || ''
     })
-    setEditingId(student.id)
+    setEditingId(aluno.id)
     setShowForm(true)
+  }
+
+  const handleDelete = async (alunoId) => {
+    if (window.confirm('Tem certeza que deseja deletar este aluno?')) {
+      await deleteAluno(alunoId)
+    }
   }
 
   return (
@@ -69,9 +106,8 @@ export function Students() {
       <div className="page-header">
         <h1>Gerenciar Alunos</h1>
         <button className="btn-add" onClick={() => {
+          resetForm()
           setShowForm(!showForm)
-          setEditingId(null)
-          setFormData({ name: '', email: '', goal: '', level: 'iniciante' })
         }}>
           {showForm ? '✕ Cancelar' : '➕ Novo Aluno'}
         </button>
@@ -80,29 +116,65 @@ export function Students() {
       {showForm && (
         <div className="form-container">
           <form onSubmit={handleSubmit} className="student-form">
-            <div className="form-group">
-              <label>Nome</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="Nome completo"
-                required
-              />
-            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Nome *</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  placeholder="Nome completo"
+                  required
+                />
+              </div>
 
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                placeholder="email@example.com"
-                required
-              />
+              <div className="form-group">
+                <label>Email *</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  placeholder="email@example.com"
+                  required
+                />
+              </div>
             </div>
 
             <div className="form-row">
+              <div className="form-group">
+                <label>Telefone</label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  placeholder="(11) 99999-9999"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Gênero</label>
+                <select
+                  value={formData.gender}
+                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                >
+                  <option value="">Selecione</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="feminino">Feminino</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Data de Nascimento</label>
+                <input
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={(e) => setFormData({...formData, dateOfBirth: e.target.value})}
+                />
+              </div>
+
               <div className="form-group">
                 <label>Objetivo</label>
                 <input
@@ -112,17 +184,29 @@ export function Students() {
                   placeholder="Ex: Ganhar massa"
                 />
               </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Altura (cm)</label>
+                <input
+                  type="number"
+                  value={formData.height}
+                  onChange={(e) => setFormData({...formData, height: e.target.value})}
+                  placeholder="170"
+                  step="0.1"
+                />
+              </div>
 
               <div className="form-group">
-                <label>Nível</label>
-                <select
-                  value={formData.level}
-                  onChange={(e) => setFormData({...formData, level: e.target.value})}
-                >
-                  <option value="iniciante">Iniciante</option>
-                  <option value="intermediario">Intermediário</option>
-                  <option value="avancado">Avançado</option>
-                </select>
+                <label>Peso (kg)</label>
+                <input
+                  type="number"
+                  value={formData.weight}
+                  onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                  placeholder="75"
+                  step="0.1"
+                />
               </div>
             </div>
 
@@ -134,7 +218,7 @@ export function Students() {
       )}
 
       <div className="students-grid">
-        {students.length === 0 ? (
+        {alunos.length === 0 ? (
           <div className="empty-state">
             <p>Nenhum aluno adicionado</p>
             <button onClick={() => setShowForm(true)} className="btn-primary">
@@ -142,50 +226,46 @@ export function Students() {
             </button>
           </div>
         ) : (
-          students.map(student => (
-            <div key={student.id} className="student-card-large">
+          alunos.map(aluno => (
+            <div key={aluno.id} className="student-card">
               <div className="card-header">
-                {student.profile?.photo ? (
-                  <img src={student.profile.photo} alt={student.name} />
+                {aluno.profilePhoto ? (
+                  <img src={aluno.profilePhoto} alt={aluno.name} />
                 ) : (
                   <div className="photo-placeholder">👤</div>
                 )}
               </div>
 
               <div className="card-body">
-                <h3>{student.name}</h3>
-                <p className="email">{student.email}</p>
-                
-                <div className="goal-section">
-                  <span className="label">Objetivo:</span>
-                  <p>{student.goal || 'Não definido'}</p>
-                </div>
+                <h3>{aluno.name}</h3>
+                <p className="email">{aluno.email}</p>
 
-                <div className="level-section">
-                  <span className="label">Nível:</span>
-                  <div className="level-badge">{student.level || 'iniciante'}</div>
+                <div className="info-section">
+                  <small><strong>Objetivo:</strong> {aluno.goal || 'Não definido'}</small>
+                  <small><strong>Altura:</strong> {aluno.measurements?.height || '-'} cm</small>
+                  <small><strong>Peso:</strong> {aluno.measurements?.weight || '-'} kg</small>
                 </div>
 
                 <div className="stats-section">
                   <div className="mini-stat">
-                    <span className="icon">💪</span>
-                    <span>{student.gamification?.totalWorkouts || 0} treinos</span>
+                    <span>💪</span>
+                    <span>{aluno.gamification?.totalWorkouts || 0}</span>
                   </div>
                   <div className="mini-stat">
-                    <span className="icon">⭐</span>
-                    <span>{student.gamification?.points || 0} pts</span>
+                    <span>⭐</span>
+                    <span>{aluno.gamification?.totalPoints || 0}</span>
                   </div>
                 </div>
               </div>
 
               <div className="card-actions">
-                <button onClick={() => handleEdit(student)} className="btn-edit">
+                <button onClick={() => handleEdit(aluno)} className="btn-edit">
                   ✏️ Editar
                 </button>
-                <a href={`/chat/${student.id}`} className="btn-chat">
+                <a href={`/chat/${aluno.id}`} className="btn-chat">
                   💬 Chat
                 </a>
-                <button onClick={() => handleDelete(student.id)} className="btn-delete">
+                <button onClick={() => handleDelete(aluno.id)} className="btn-delete">
                   🗑️ Deletar
                 </button>
               </div>
