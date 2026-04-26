@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#E07800">
-    <title>💪 FITNESS - Transforme Seu Corpo</title>
+    <title>💪 FITNESS - Personal Trainer</title>
     <style>
         * {
             margin: 0;
@@ -16,68 +16,61 @@
             width: 100%;
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f5f5;
         }
 
+        /* LANDING PAGE */
         .landing {
-            background: linear-gradient(135deg, rgba(224, 120, 0, 0.75) 0%, rgba(255, 153, 0, 0.75) 100%),
-                        url('https://i.imgur.com/PZM2tJg.jpg') center/cover;
-            background-attachment: fixed;
+            background: linear-gradient(135deg, rgba(224, 120, 0, 0.7) 0%, rgba(255, 153, 0, 0.7) 100%),
+                        url('https://i.imgur.com/PZM2tJg.jpg') center/cover fixed;
             color: white;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 20px;
             justify-content: center;
             align-items: center;
-            position: relative;
-        }
-
-        .landing-content {
+            padding: 20px;
             text-align: center;
-            max-width: 800px;
-            z-index: 1;
         }
 
         .landing-logo {
-            font-size: 80px;
+            font-size: 100px;
             margin-bottom: 20px;
-            display: inline-block;
             animation: bounce 2s infinite;
         }
 
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+            50% { transform: translateY(-30px); }
         }
 
         .landing-title {
-            font-size: 48px;
+            font-size: 52px;
             font-weight: 700;
             margin-bottom: 12px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 3px 15px rgba(0,0,0,0.4);
         }
 
         .landing-subtitle {
-            font-size: 20px;
+            font-size: 22px;
+            margin-bottom: 50px;
             opacity: 0.95;
-            margin-bottom: 40px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         .landing-features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 20px;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
+            max-width: 900px;
         }
 
-        .feature-card {
-            background: rgba(255,255,255,0.1);
+        .feature {
+            background: rgba(255,255,255,0.15);
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 15px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
         }
 
         .feature-icon {
@@ -86,82 +79,83 @@
         }
 
         .feature-text {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
         }
 
-        .landing-cta {
+        .cta-buttons {
             display: flex;
-            gap: 12px;
+            gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
-        .btn-login, .btn-signup {
-            padding: 14px 32px;
+        .btn {
+            padding: 16px 40px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
         }
 
-        .btn-login {
+        .btn-primary {
             background: white;
             color: #E07800;
         }
 
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .btn-signup {
+        .btn-secondary {
             background: rgba(255,255,255,0.2);
             color: white;
             border: 2px solid white;
         }
 
-        .btn-signup:hover {
+        .btn-secondary:hover {
             background: white;
             color: #E07800;
         }
 
-        .auth-modal {
+        /* AUTH MODAL */
+        .auth-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
             z-index: 1000;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
 
-        .auth-modal.show {
+        .auth-overlay.show {
             display: flex;
         }
 
-        .auth-card {
+        .auth-box {
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            max-width: 450px;
+            max-width: 500px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideIn 0.5s ease-out;
+            animation: slideUp 0.5s ease;
             max-height: 90vh;
             overflow-y: auto;
         }
 
-        @keyframes slideIn {
+        @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(50px);
             }
             to {
                 opacity: 1;
@@ -174,28 +168,47 @@
             color: white;
             padding: 40px 20px;
             text-align: center;
+            position: relative;
         }
 
-        .auth-header h1 {
-            font-size: 40px;
-            margin-bottom: 8px;
+        .auth-header h2 {
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+
+        .close-auth {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .close-auth:hover {
+            background: rgba(255,255,255,0.4);
         }
 
         .auth-tabs {
             display: flex;
             border-bottom: 2px solid #eee;
-            background: #f8f8f8;
         }
 
         .tab {
             flex: 1;
             padding: 16px;
-            background: transparent;
+            background: none;
             border: none;
+            cursor: pointer;
             font-size: 14px;
             font-weight: 600;
             color: #999;
-            cursor: pointer;
             border-bottom: 3px solid transparent;
             margin-bottom: -2px;
             transition: all 0.3s;
@@ -204,7 +217,6 @@
         .tab.active {
             color: #E07800;
             border-bottom-color: #E07800;
-            background: white;
         }
 
         .auth-form {
@@ -212,7 +224,7 @@
             display: none;
         }
 
-        .auth-form.show {
+        .auth-form.active {
             display: block;
         }
 
@@ -242,26 +254,26 @@
 
         .form-group input:focus, .form-group select:focus {
             border-color: #E07800;
-            box-shadow: 0 0 0 3px rgba(224, 120, 0, 0.1);
+            box-shadow: 0 0 0 3px rgba(224,120,0,0.1);
             background: #fffaf0;
         }
 
-        .error-message {
+        .error {
             background: #ffebee;
             color: #d32f2f;
             padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-size: 13px;
             border-left: 4px solid #d32f2f;
             display: none;
         }
 
-        .error-message.show {
+        .error.show {
             display: block;
         }
 
-        .btn-auth {
+        .btn-submit {
             width: 100%;
             padding: 14px;
             background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
@@ -272,36 +284,25 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
+            margin-top: 10px;
         }
 
-        .btn-auth:hover:not(:disabled) {
+        .btn-submit:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(224, 120, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(224,120,0,0.3);
         }
 
-        .btn-auth:disabled {
+        .btn-submit:disabled {
             opacity: 0.6;
         }
 
-        .auth-demo {
+        .auth-footer {
             background: #fffaf0;
             border-top: 1px solid #FFE0C0;
-            padding: 20px;
+            padding: 16px;
             text-align: center;
             font-size: 12px;
             color: #999;
-        }
-
-        .btn-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: white;
-            z-index: 1001;
         }
 
         .toast {
@@ -313,15 +314,27 @@
             padding: 16px 24px;
             border-radius: 8px;
             z-index: 2000;
+            animation: slideInRight 0.3s;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
             .landing-title {
-                font-size: 32px;
+                font-size: 36px;
             }
 
             .landing-logo {
-                font-size: 60px;
+                font-size: 70px;
             }
 
             .landing-features {
@@ -329,14 +342,31 @@
                 gap: 12px;
             }
 
-            .auth-card {
+            .cta-buttons {
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+
+            .auth-box {
                 max-width: 100%;
+            }
+
+            .auth-header h2 {
+                font-size: 28px;
             }
         }
 
         @media (max-width: 480px) {
             .landing-title {
-                font-size: 26px;
+                font-size: 28px;
+            }
+
+            .landing-logo {
+                font-size: 50px;
             }
 
             .landing-subtitle {
@@ -347,63 +377,67 @@
                 grid-template-columns: 1fr;
             }
 
-            .btn-login, .btn-signup {
-                padding: 12px 24px;
-                font-size: 14px;
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .feature-text {
+                font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
 
+<!-- LANDING PAGE -->
 <div class="landing">
-    <button class="btn-close" onclick="closeAuth()">✕</button>
-    
-    <div class="landing-content">
-        <div class="landing-logo">💪</div>
-        <h1 class="landing-title">FITNESS</h1>
-        <p class="landing-subtitle">Transforme Seu Corpo, Alcance Seus Objetivos</p>
+    <div class="landing-logo">💪</div>
+    <h1 class="landing-title">FITNESS</h1>
+    <p class="landing-subtitle">Transforme Seu Corpo, Alcance Seus Objetivos</p>
 
-        <div class="landing-features">
-            <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <div class="feature-text">Treinos Personalizados</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <div class="feature-text">Progresso em Tempo Real</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🏆</div>
-                <div class="feature-text">Ranking & Gamificação</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">💬</div>
-                <div class="feature-text">Chat com PT</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <div class="feature-text">Funciona Offline</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔥</div>
-                <div class="feature-text">Streaks & Badges</div>
-            </div>
+    <div class="landing-features">
+        <div class="feature">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-text">Treinos Personalizados</div>
         </div>
+        <div class="feature">
+            <div class="feature-icon">📊</div>
+            <div class="feature-text">Progresso em Tempo Real</div>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🏆</div>
+            <div class="feature-text">Gamificação & Ranking</div>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">💬</div>
+            <div class="feature-text">Chat com Personal</div>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🍎</div>
+            <div class="feature-text">Prescrição de Dieta</div>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">📈</div>
+            <div class="feature-text">Acompanhamento Completo</div>
+        </div>
+    </div>
 
-        <div class="landing-cta">
-            <button class="btn-login" onclick="showAuth('login')">Entrar</button>
-            <button class="btn-signup" onclick="showAuth('signup')">Criar Conta</button>
-        </div>
+    <div class="cta-buttons">
+        <button class="btn btn-primary" onclick="openAuth('login')">Entrar</button>
+        <button class="btn btn-secondary" onclick="openAuth('signup')">Criar Conta</button>
     </div>
 </div>
 
-<div id="authModal" class="auth-modal">
-    <button class="btn-close" onclick="closeAuth()">✕</button>
-    
-    <div class="auth-card">
+<!-- AUTH MODAL -->
+<div id="authOverlay" class="auth-overlay">
+    <div class="auth-box">
         <div class="auth-header">
-            <h1>💪 FITNESS</h1>
+            <button class="close-auth" onclick="closeAuth()">✕</button>
+            <h2>💪 FITNESS</h2>
         </div>
 
         <div class="auth-tabs">
@@ -411,8 +445,9 @@
             <button class="tab" onclick="switchTab('signup')">Cadastro</button>
         </div>
 
-        <form id="loginForm" class="auth-form show" onsubmit="handleLogin(event)">
-            <div class="error-message" id="loginError"></div>
+        <!-- LOGIN FORM -->
+        <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+            <div class="error" id="loginError"></div>
             <div class="form-group">
                 <label>Email</label>
                 <input type="email" id="loginEmail" placeholder="seu@email.com" required>
@@ -421,39 +456,45 @@
                 <label>Senha</label>
                 <input type="password" id="loginPassword" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="btn-auth" id="loginBtn">Entrar</button>
+            <button type="submit" class="btn-submit" id="loginBtn">Entrar</button>
         </form>
 
+        <!-- SIGNUP FORM -->
         <form id="signupForm" class="auth-form" onsubmit="handleSignup(event)">
-            <div class="error-message" id="signupError"></div>
+            <div class="error" id="signupError"></div>
             <div class="form-group">
-                <label>Nome</label>
-                <input type="text" id="signupName" required>
+                <label>Nome Completo</label>
+                <input type="text" id="signupName" placeholder="Seu Nome" required>
             </div>
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" id="signupEmail" required>
+                <input type="email" id="signupEmail" placeholder="seu@email.com" required>
             </div>
             <div class="form-group">
                 <label>Senha</label>
-                <input type="password" id="signupPassword" required>
+                <input type="password" id="signupPassword" placeholder="••••••••" required>
             </div>
             <div class="form-group">
-                <label>Tipo</label>
-                <select id="signupRole" onchange="toggleCode()">
+                <label>Telefone</label>
+                <input type="tel" id="signupPhone" placeholder="(11) 99999-9999">
+            </div>
+            <div class="form-group">
+                <label>Tipo de Conta</label>
+                <select id="signupRole" onchange="togglePTCode()" required>
+                    <option value="">Selecione...</option>
                     <option value="aluno">Aluno</option>
                     <option value="pt">Personal Trainer</option>
                 </select>
             </div>
-            <div class="form-group" id="codeDiv" style="display:none;">
-                <label>Código PT</label>
-                <input type="password" id="trainerCode" placeholder="TRAINER2024">
+            <div class="form-group" id="ptCodeDiv" style="display: none;">
+                <label>Código de Personal Trainer</label>
+                <input type="password" id="ptCode" placeholder="Código de acesso">
             </div>
-            <button type="submit" class="btn-auth" id="signupBtn">Cadastrar</button>
+            <button type="submit" class="btn-submit" id="signupBtn">Cadastrar</button>
         </form>
 
-        <div class="auth-demo">
-            💡 Novo? Cadastre-se como Aluno. Será preciso aprovação do PT!
+        <div class="auth-footer">
+            💡 <strong>Demo:</strong> trainer@test.com / 123456 (PT) | aluno@test.com / 123456 (Aluno)
         </div>
     </div>
 </div>
@@ -476,37 +517,38 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // Check if user is logged in
     auth.onAuthStateChanged(user => {
         if (user) {
             window.location.href = 'app.html';
         }
     });
 
-    function showAuth(tab) {
-        document.getElementById('authModal').classList.add('show');
+    function openAuth(tab) {
+        document.getElementById('authOverlay').classList.add('show');
         switchTab(tab);
     }
 
     function closeAuth() {
-        document.getElementById('authModal').classList.remove('show');
+        document.getElementById('authOverlay').classList.remove('show');
     }
 
     function switchTab(tab) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('show'));
-        
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+
         if (tab === 'login') {
             document.querySelectorAll('.tab')[0].classList.add('active');
-            document.getElementById('loginForm').classList.add('show');
+            document.getElementById('loginForm').classList.add('active');
         } else {
             document.querySelectorAll('.tab')[1].classList.add('active');
-            document.getElementById('signupForm').classList.add('show');
+            document.getElementById('signupForm').classList.add('active');
         }
     }
 
-    function toggleCode() {
+    function togglePTCode() {
         const role = document.getElementById('signupRole').value;
-        document.getElementById('codeDiv').style.display = role === 'pt' ? 'block' : 'none';
+        document.getElementById('ptCodeDiv').style.display = role === 'pt' ? 'block' : 'none';
     }
 
     async function handleLogin(e) {
@@ -518,6 +560,7 @@
 
         btn.disabled = true;
         btn.textContent = 'Entrando...';
+        errorDiv.classList.remove('show');
 
         try {
             await auth.signInWithEmailAndPassword(email, password);
@@ -535,19 +578,21 @@
         const name = document.getElementById('signupName').value;
         const email = document.getElementById('signupEmail').value;
         const password = document.getElementById('signupPassword').value;
+        const phone = document.getElementById('signupPhone').value;
         const role = document.getElementById('signupRole').value;
-        const code = document.getElementById('trainerCode').value;
+        const ptCode = document.getElementById('ptCode').value;
         const btn = document.getElementById('signupBtn');
         const errorDiv = document.getElementById('signupError');
 
-        if (role === 'pt' && code !== 'TRAINER2024') {
-            errorDiv.textContent = '❌ Código de PT inválido';
+        if (role === 'pt' && ptCode !== 'TRAINER2024') {
+            errorDiv.textContent = '❌ Código de Personal Trainer inválido';
             errorDiv.classList.add('show');
             return;
         }
 
         btn.disabled = true;
-        btn.textContent = 'Criando...';
+        btn.textContent = 'Criando conta...';
+        errorDiv.classList.remove('show');
 
         try {
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
@@ -559,7 +604,12 @@
                     type: 'pt',
                     name,
                     email,
-                    createdAt: new Date()
+                    phone,
+                    bio: '',
+                    specialty: '',
+                    profilePhoto: '',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
                 });
             } else {
                 await db.collection('alunos').add({
@@ -567,22 +617,41 @@
                     type: 'aluno',
                     name,
                     email,
-                    status: 'pending',
+                    phone,
+                    personalTrainerId: '',
+                    goal: '',
+                    dateOfBirth: '',
+                    gender: '',
+                    measurements: {
+                        height: 0,
+                        weight: 0,
+                        chest: 0,
+                        waist: 0,
+                        hips: 0,
+                        arm: 0,
+                        leg: 0
+                    },
+                    profilePhoto: '',
                     gamification: {
                         points: 0,
                         streak: 0,
                         badges: [],
-                        totalWorkouts: 0
+                        totalWorkouts: 0,
+                        totalPoints: 0,
+                        level: 'Novato'
                     },
-                    createdAt: new Date()
+                    status: 'pending',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
                 });
             }
 
-            showToast('✅ Cadastro realizado!');
-            closeAuth();
-            setTimeout(() => showAuth('login'), 1500);
+            showToast('✅ Conta criada com sucesso!');
+            setTimeout(() => {
+                window.location.href = 'app.html';
+            }, 1500);
         } catch (error) {
-            errorDiv.textContent = '❌ ' + (error.message || 'Erro ao cadastrar');
+            errorDiv.textContent = '❌ ' + (error.message || 'Erro ao criar conta');
             errorDiv.classList.add('show');
             btn.disabled = false;
             btn.textContent = 'Cadastrar';
@@ -596,6 +665,13 @@
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
+
+    // Close modal when clicking outside
+    document.getElementById('authOverlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('authOverlay')) {
+            closeAuth();
+        }
+    });
 </script>
 
 </body>
