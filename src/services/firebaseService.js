@@ -414,4 +414,294 @@ export const updateDieta = async (dietaId, data) => {
   try {
     await updateDoc(doc(db, 'dietas', dietaId), data)
   } catch (error) {
-    console.error('Erro a
+    console.error('Erro ao atualizar dieta:', error)
+    throw error
+  }
+}
+
+// ====== CHAT ======
+export const getOrCreateConversation = async (userId1, userId2) => {
+  try {
+    const conversationId = [userId1, userId2].sort().join('_')
+    const docRef = doc(db, 'chats', conversationId)
+    const docSnap = await getDoc(docRef)
+    
+    if (!docSnap.exists()) {
+      await setDoc(docRef, {
+        participants: [userId1, userId2],
+        createdAt: serverTimestamp(),
+        lastMessage: '',
+        lastMessageTime: serverTimestamp()
+      })
+    }
+    
+    return conversationId
+  } catch (error) {
+    console.error('Erro ao criar conversa:', error)
+    throw error
+  }
+}
+
+export const sendMessage = async (conversationId, senderId, text) => {
+  try {
+    const messagesRef = collection(db, 'chats', conversationId, 'messages')
+    await addDoc(messagesRef, {
+      senderId,
+      text,
+      timestamp: serverTimestamp(),
+      read: false
+    })
+
+    await updateDoc(doc(db, 'chats', conversationId), {
+      lastMessage: text,
+      lastMessageTime: serverTimestamp()
+    })
+  } catch (error) {
+    console.error('Erro ao enviar mensagem:', error)
+    throw error
+  }
+}
+
+export const subscribeToChat = (conversationId, callback) => {
+  try {
+    const q = query(
+      collection(db, 'chats', conversationId, 'messages'),
+      orderBy('timestamp', 'asc')
+    )
+    return onSnapshot(q, (snapshot) => {
+      const messages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate?.() || new Date()
+      }))
+      callback(messages)
+    }, (error) => {
+      console.error('Erro ao buscar mensagens:', error)
+      callback([])
+    })
+  } catch (error) {
+    console.error('Erro na subscription chat:', error)
+  }
+}
+
+// ====== NOTIFICAÇÕES ======
+export const sendNotification = async (userId, notification) => {
+  try {
+    const notificationsRef = collection(db, 'notifications', userId, 'items')
+    await addDoc(notificationsRef, {
+      type: notification.type,
+      title: notification.title,
+      body: notification.body,
+      actionUrl: notification.actionUrl || '',
+      timestamp: serverTimestamp(),
+      read: false
+    })
+  } catch (error) {
+    console.error('Erro ao enviar notificação:', error)
+    throw error
+  }
+}
+
+export const subscribeToNotifications = (userId, callback) => {
+  try {
+    const q = query(
+      collection(db, 'notifications', userId, 'items'),
+      orderBy('timestamp', 'desc')
+    )
+    return onSnapshot(q, (snapshot) => {
+      const notifications = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate?.() || new Date()
+      }))
+      callback(notifications)
+    }, (error) => {
+      console.error('Erro ao buscar notificações:', error)
+      callback([])
+    })
+  } catch (error) {
+    console.error('Erro na subscription notificações:', error)
+  }
+}
+
+export const markNotificationAsRead = async (userId, notificationId) => {
+  try {
+    await updateDoc(doc(db, 'notifications', userId, 'items', notificationId), {
+      read: true
+    })
+  } catch (error) {
+    console.error('Erro ao marcar notificação:', error)
+  }
+}
+
+// ====== FOTOS ======
+export const uploadProfilePhoto = async (userId, file, userType = 'user') => {
+  try {
+    const storageRef = ref(storage, `${userType}s/${userId}/profile`)
+    
+    try {
+      await deleteObject(storageRef)
+    } catch (e) {
+      // Photo doesn't exist, that's fine
+    }
+
+    await uploadBytes(storageRef, file)
+    const url = await getDownloadURL(storageRef)
+
+    if (userType === 'user') {
+      await updatePersonalTrainer(userId, { profilePhoto: url })
+    } else {
+      await updateAluno(userId, { profilePhoto: url })
+    }
+
+    return url
+  } catch (error) {
+    console.error('Erro ao fazer upload de foto:', error)
+    throw error
+  }
+}
+
+export const uploadProgressPhoto = async (alunoId, file) => {
+  try {
+    const timestamp = Date.now()
+    const storageRef = ref(storage, `progress/${alunoId}/${timestamp}`)
+    await uploadBytes(storageRef, file)
+    const url = await getDownloadURL(storageRef)
+    
+    return url
+  } catch (error) {
+    console.error('Erro ao fazer upload de foto de progresso:', error)
+    throw error
+  }
+}
+
+// ====== GAMIFICAÇÃO ======
+export const addPoints = async (alunoId, points, reason) => {
+  try {
+    await addDoc(collection(db, 'pontos'), {
+      alunoId,
+      points,
+      reason,
+      timestamp: serverTimestamp()
+    })
+
+    const aluno = await getAluno(alunoId)
+    const currentPoints = aluno.gamification?.totalPoints || 0
+    
+    await updateAluno(alunoId, {
+      'gamification.totalPoints': currentPoints + points,
+      'gamification.points': currentPoints + points
+    })
+  } catch (error) {
+    console.error('Erro ao adicionar pontos:', error)
+    throw error
+  }
+}
+
+export const updateStreak = async (alunoId) => {
+  try {
+    const today = new Date().toDateString()
+    const aluno = await getAluno(alunoId)
+    const lastCheckIn = aluno.gamification?.lastCheckIn
+
+    if (lastCheckIn !== today) {
+      const currentStreak = aluno.gamification?.streak || 0
+      
+      await updateAluno(alunoId, {
+        'gamification.lastCheckIn': today,
+        'gamification.streak': currentStreak + 1
+      })
+
+      if ((currentStreak + 1) % 7 === 0) {
+        await addPoints(alunoId, 100, 'streak_weekly')
+      }
+      if ((currentStreak + 1) % 30 === 0) {
+        await addPoints(alunoId, 500, 'streak_monthly')
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao atualizar streak:', error)
+    throw error
+  }
+}
+
+export const unlockBadge = async (alunoId, badgeId) => {
+  try {
+    const aluno = await getAluno(alunoId)
+    const badges = aluno.gamification?.badges || []
+    
+    if (!badges.includes(badgeId)) {
+      await updateAluno(alunoId, {
+        'gamification.badges': [...badges, badgeId]
+      })
+
+      await addPoints(alunoId, 50, `badge_unlocked_${badgeId}`)
+    }
+  } catch (error) {
+    console.error('Erro ao desbloquear badge:', error)
+    throw error
+  }
+}
+
+// ====== RANKING ======
+export const getTopAlunosByTrainer = async (personalTrainerId, limit = 50) => {
+  try {
+    const q = query(
+      collection(db, 'alunos'),
+      where('personalTrainerId', '==', personalTrainerId),
+      orderBy('gamification.totalPoints', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.slice(0, limit).map((doc, index) => ({
+      id: doc.id,
+      ...doc.data(),
+      rank: index + 1
+    }))
+  } catch (error) {
+    console.error('Erro ao buscar ranking:', error)
+    throw error
+  }
+}
+
+export const subscribeToRanking = (personalTrainerId, callback) => {
+  try {
+    const q = query(
+      collection(db, 'alunos'),
+      where('personalTrainerId', '==', personalTrainerId),
+      orderBy('gamification.totalPoints', 'desc')
+    )
+    return onSnapshot(q, (snapshot) => {
+      const alunos = snapshot.docs.map((doc, index) => ({
+        id: doc.id,
+        ...doc.data(),
+        rank: index + 1
+      }))
+      callback(alunos)
+    }, (error) => {
+      console.error('Erro ao buscar ranking:', error)
+      callback([])
+    })
+  } catch (error) {
+    console.error('Erro na subscription ranking:', error)
+  }
+}
+
+// ====== ANALYTICS / RELATÓRIOS ======
+export const getAlunoProgress = async (alunoId) => {
+  try {
+    const aluno = await getAluno(alunoId)
+    const workoutsCompleted = await getWorkoutsCompleted(alunoId)
+    
+    return {
+      aluno,
+      totalWorkouts: workoutsCompleted.length,
+      lastWorkout: workoutsCompleted[0] || null,
+      streakDays: aluno.gamification?.streak || 0,
+      totalPoints: aluno.gamification?.totalPoints || 0,
+      badges: aluno.gamification?.badges || []
+    }
+  } catch (error) {
+    console.error('Erro ao buscar progresso:', error)
+    throw error
+  }
+}
