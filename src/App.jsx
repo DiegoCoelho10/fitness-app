@@ -2,63 +2,60 @@ import React, { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './context/authStore'
 import { Layout } from './components/Layout'
-import { ProtectedRoute } from './components/ProtectedRoute'
-// Pages
-import { Login } from './pages/Login'
+import { Auth } from './pages/Auth'
 import { Dashboard } from './pages/Dashboard'
 import { Students } from './pages/Students'
+import { Profile } from './pages/Profile'
 import { CreateWorkout } from './pages/CreateWorkout'
 import { MyWorkout } from './pages/MyWorkout'
 import { Chat } from './pages/Chat'
-import { Profile } from './pages/Profile'
 import { Ranking } from './pages/Ranking'
 import './App.css'
 
-function App() {
-  const { initAuth, user, loading } = useAuthStore()
-
-  useEffect(() => {
-    const init = async () => {
-      await initAuth()
-    }
-    init()
-  }, [initAuth])
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuthStore()
 
   if (loading) {
-    return (
-      <div className="app-loading">
-        <div className="spinner"></div>
-        <p>Carregando...</p>
-      </div>
-    )
+    return <div className="loading-screen">Carregando...</div>
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />
+  }
+
+  return <Layout>{children}</Layout>
+}
+
+function App() {
+  const { user, loading, checkAuth } = useAuthStore()
+
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
+
+  if (loading) {
+    return <div className="loading-screen">Carregando...</div>
   }
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/*"
-          element={
-            user ? (
-              <Layout>
-                <Routes>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/students" element={<ProtectedRoute role="personal_trainer"><Students /></ProtectedRoute>} />
-                  <Route path="/students/:studentId/workout/new" element={<ProtectedRoute role="personal_trainer"><CreateWorkout /></ProtectedRoute>} />
-                  <Route path="/workouts" element={<ProtectedRoute role="personal_trainer"><Ranking /></ProtectedRoute>} />
-                  <Route path="/chat/:studentId" element={<Chat />} />
-                  <Route path="/workout/:workoutId" element={<MyWorkout />} />
-                  <Route path="/ranking" element={<ProtectedRoute role="personal_trainer"><Ranking /></ProtectedRoute>} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="*" element={<Navigate to="/dashboard" />} />
-                </Routes>
-              </Layout>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
+        {/* Auth Routes */}
+        <Route path="/login" element={<Auth />} />
+
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
+        <Route path="/students/:studentId/workout/new" element={<ProtectedRoute><CreateWorkout /></ProtectedRoute>} />
+        <Route path="/workouts" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
+        <Route path="/chat/:studentId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+        <Route path="/workout/:workoutId" element={<ProtectedRoute><MyWorkout /></ProtectedRoute>} />
+        <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
+        {/* Fallback */}
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </BrowserRouter>
   )
