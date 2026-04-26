@@ -51,16 +51,25 @@
   gap: 16px;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  grid-column: 1 / -1;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
 }
 
 .form-group label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   margin-bottom: 8px;
   color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .form-group input,
@@ -77,12 +86,6 @@
 .form-group select:focus {
   border-color: #E07800;
   box-shadow: 0 0 0 3px rgba(224, 120, 0, 0.1);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
 }
 
 .btn-submit {
@@ -125,7 +128,7 @@
   margin-bottom: 24px;
 }
 
-.student-card-large {
+.student-card {
   background: white;
   border-radius: 12px;
   overflow: hidden;
@@ -135,7 +138,7 @@
   flex-direction: column;
 }
 
-.student-card-large:hover {
+.student-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 24px rgba(0,0,0,0.15);
 }
@@ -183,36 +186,20 @@
   font-size: 13px;
 }
 
-.goal-section,
-.level-section {
+.info-section {
   margin-bottom: 12px;
 }
 
-.label {
+.info-section small {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
   color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
 
-.goal-section p {
-  margin: 0;
-  font-size: 14px;
-  color: #333;
-}
-
-.level-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  background: #FFE0C0;
-  color: #E07800;
-  border-radius: 20px;
-  font-size: 12px;
+.info-section strong {
   font-weight: 600;
-  text-transform: capitalize;
+  color: #333;
 }
 
 .stats-section {
@@ -233,7 +220,7 @@
   font-weight: 600;
 }
 
-.mini-stat .icon {
+.mini-stat span:first-child {
   font-size: 16px;
 }
 
@@ -288,23 +275,6 @@
 
 .btn-delete:hover {
   background: #e0e0e0;
-}
-
-.btn-primary {
-  display: inline-block;
-  padding: 12px 24px;
-  background: #E07800;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-primary:hover {
-  background: #FF9900;
 }
 
 @media (max-width: 768px) {
