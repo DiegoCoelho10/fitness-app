@@ -4,666 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#E07800">
-    <title>💪 FITNESS - Execução de Treino</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #fffaf0 100%);
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        /* HEADER */
-        header {
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(224,120,0,0.3);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .back-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
-
-        .back-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .header-title {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .progress-info {
-            display: flex;
-            gap: 20px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        /* MAIN */
-        main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 4px;
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #E07800 0%, #FF9900 100%);
-            transition: width 0.3s;
-        }
-
-        /* EXERCISE CARD */
-        .exercise-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            border: 2px solid #FFE0C0;
-            transition: all 0.3s;
-        }
-
-        .exercise-card.current {
-            border-color: #E07800;
-            box-shadow: 0 8px 32px rgba(224,120,0,0.15);
-        }
-
-        .exercise-card.completed {
-            border-color: #4caf50;
-            background: #f1f8f5;
-        }
-
-        .exercise-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .exercise-number {
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        .exercise-card.completed .exercise-number {
-            background: #4caf50;
-        }
-
-        .exercise-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .exercise-status {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .exercise-status.completed {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .exercise-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .detail {
-            background: #f8f8f8;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .detail-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #E07800;
-        }
-
-        .detail-label {
-            font-size: 11px;
-            color: #999;
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-
-        /* SETS COUNTER */
-        .sets-section {
-            background: #fffaf0;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .set-counter {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .set-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .set-number {
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        .set-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-
-        .btn-small.success {
-            background: #4caf50;
-            color: white;
-        }
-
-        .btn-small.success:hover {
-            background: #388e3c;
-        }
-
-        .btn-small.secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .btn-small.secondary:hover {
-            background: #ddd;
-        }
-
-        .reps-input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            width: 80px;
-            text-align: center;
-            font-weight: 600;
-            outline: none;
-        }
-
-        .reps-input:focus {
-            border-color: #E07800;
-            box-shadow: 0 0 0 3px rgba(224,120,0,0.1);
-        }
-
-        /* REST TIMER */
-        .rest-timer {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffe8b6 100%);
-            border: 2px solid #ffc107;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .timer-display {
-            font-size: 36px;
-            font-weight: 700;
-            color: #E07800;
-            margin-bottom: 12px;
-        }
-
-        .timer-label {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .timer-action {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        /* EXERCISE ACTIONS */
-        .exercise-actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            flex: 1;
-            min-width: 140px;
-            padding: 14px;
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(224,120,0,0.3);
-        }
-
-        .btn-secondary {
-            flex: 1;
-            min-width: 140px;
-            padding: 14px;
-            background: #f0f0f0;
-            color: #333;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-secondary:hover {
-            background: #ddd;
-        }
-
-        /* COMPLETION MODAL */
-        .completion-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .completion-modal.show {
-            display: flex;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .completion-box {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .completion-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: bounce 0.6s;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-30px); }
-        }
-
-        .completion-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 12px;
-        }
-
-        .completion-message {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .completion-points {
-            background: linear-gradient(135deg, #fffaf0 0%, #fff5e6 100%);
-            border: 2px solid #FFD700;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .points-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: #E07800;
-        }
-
-        .points-label {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-        }
-
-        .streak-info {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .completion-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-completion {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-completion.continue {
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-        }
-
-        .btn-completion.continue:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(224,120,0,0.3);
-        }
-
-        .btn-completion.back {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .btn-completion.back:hover {
-            background: #ddd;
-        }
-
-        /* CONFETTI */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            pointer-events: none;
-        }
-
-        /* EMPTY STATE */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-
-        .empty-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .empty-message {
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .empty-action {
-            display: inline-block;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        /* TOAST */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #333;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            z-index: 1500;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            header {
-                padding: 12px 16px;
-            }
-
-            .header-title {
-                font-size: 16px;
-            }
-
-            .progress-info {
-                gap: 12px;
-                font-size: 12px;
-            }
-
-            main {
-                padding: 16px 12px;
-            }
-
-            .exercise-card {
-                padding: 16px;
-            }
-
-            .exercise-name {
-                font-size: 18px;
-            }
-
-            .exercise-details {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .completion-box {
-                padding: 30px 20px;
-            }
-
-            .completion-title {
-                font-size: 24px;
-            }
-
-            .completion-icon {
-                font-size: 60px;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                min-width: 100px;
-                padding: 12px;
-                font-size: 13px;
-            }
-
-            .exercise-actions {
-                flex-direction: column;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .progress-info {
-                flex-direction: column;
-                gap: 4px;
-            }
-
-            .exercise-details {
-                grid-template-columns: 1fr;
-            }
-
-            .detail {
-                padding: 10px;
-            }
-
-            .completion-actions {
-                flex-direction: column;
-            }
-
-            .btn-completion {
-                width: 100%;
-            }
-        }
-    </style>
+    <title>💪 FITNESS - Seu Treino</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
 </head>
-<body>
+<body class="bg-gray-50">
 
-<div class="container">
-    <header>
-        <div class="header-left">
-            <button class="back-btn" onclick="goBack()">←</button>
-            <div class="header-title" id="headerTitle">Carregando...</div>
-        </div>
-        <div class="progress-info">
+<!-- HEADER -->
+<div class="bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+        <button onclick="goBack()" class="text-2xl hover:scale-110 transition">←</button>
+        <h1 id="workoutTitle" class="text-xl font-black">Carregando...</h1>
+        <div class="flex gap-4 text-sm font-bold">
             <span id="exerciseCounter">0/0</span>
-            <span id="pointsCounter">⭐ 0pts</span>
+            <span id="pointsCounter">⭐ 0</span>
         </div>
-    </header>
+    </div>
+    <div class="bg-black/20 h-2 max-w-4xl mx-auto">
+        <div id="progressBar" class="h-full bg-white transition-all duration-300" style="width: 0%"></div>
+    </div>
+</div>
 
-    <main>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-        </div>
-
-        <div id="exercisesContainer"></div>
-
-        <div id="emptyState" class="empty-state">
-            <div class="empty-icon">💪</div>
-            <div class="empty-title">Carregando seu treino...</div>
-            <div class="empty-message">Aguarde um momento</div>
-        </div>
-    </main>
+<!-- MAIN -->
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div id="exercisesContainer" class="space-y-6"></div>
+    
+    <div id="emptyState" class="text-center py-16">
+        <div class="text-6xl mb-4 animate-spin">⚙️</div>
+        <p class="text-gray-600 text-lg">Carregando seu treino...</p>
+    </div>
 </div>
 
 <!-- COMPLETION MODAL -->
-<div id="completionModal" class="completion-modal">
-    <div class="completion-box">
-        <div class="completion-icon" id="completionIcon">🎉</div>
-        <h2 class="completion-title" id="completionTitle">Parabéns!</h2>
-        <p class="completion-message" id="completionMessage">Você completou o treino!</p>
+<div id="completionModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center animate-bounce">
+        <div class="text-7xl mb-4 animate-bounce" style="animation-delay: 0.2s;">🎉</div>
+        <h2 class="text-3xl font-black text-gray-900 mb-2">Parabéns!</h2>
+        <p class="text-gray-600 mb-6">Você completou o treino!</p>
         
-        <div class="completion-points">
-            <div class="points-value" id="totalPoints">+500</div>
-            <div class="points-label">Pontos Ganhos</div>
+        <div class="bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-400 rounded-lg p-6 mb-6">
+            <div class="text-4xl font-black text-orange-600" id="totalPoints">+500</div>
+            <div class="text-sm text-gray-600 font-bold mt-2">PONTOS GANHOS</div>
+            <div class="text-xs text-gray-500 mt-1" id="bonusText"></div>
         </div>
 
-        <div class="streak-info" id="streakInfo">
-            <strong>🔥 Sequência:</strong> <span id="streakValue">0</span> dias
-        </div>
-
-        <div id="badgesInfo" style="margin-bottom: 20px;"></div>
-
-        <div class="completion-actions">
-            <button class="btn-completion continue" onclick="continueToApp()">Voltar ao App</button>
-            <button class="btn-completion back" onclick="repeatWorkout()">Repetir Treino</button>
+        <div class="flex flex-col gap-3">
+            <button onclick="continueToApp()" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-bold transition">
+                Voltar ao App
+            </button>
+            <button onclick="repeatWorkout()" class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-bold transition">
+                Repetir Treino
+            </button>
         </div>
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+<!-- CONFETTI -->
+<canvas id="confetti" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 40;"></canvas>
 
 <script>
     const firebaseConfig = {
@@ -681,31 +80,19 @@
 
     let currentUser = null;
     let workout = null;
-    let alunoProfile = null;
     let currentExerciseIndex = 0;
-    let totalPoints = 0;
     let completedExercises = [];
-    let exerciseTimers = {};
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const treinoId = urlParams.get('treinoId');
-    const alunoId = urlParams.get('alunoId');
+    let totalPoints = 0;
+    let userData = null;
 
     const motivations = [
-        '💪 Você é forte!',
-        '🔥 Que força!',
-        '⚡ Perfeito!',
-        '🎯 Top demais!',
-        '🏆 Campeão!',
-        '✨ Brilhante!',
-        '🚀 Vamo!',
-        '👑 Lendário!',
-        '🌟 Épico!',
-        '💯 Máximo!'
+        '💪 Você é forte!', '🔥 Que força!', '⚡ Perfeito!', '🎯 Top!',
+        '🏆 Campeão!', '✨ Brilhante!', '🚀 Vamo!', '👑 Lendário!'
     ];
 
     auth.onAuthStateChanged(async user => {
         if (!user) {
+            console.log('❌ No user, redirecting');
             window.location.href = 'index.html';
             return;
         }
@@ -715,127 +102,138 @@
 
     async function initWorkout() {
         try {
-            if (treinoId) {
-                const doc = await db.collection('treinos').doc(treinoId).get();
-                if (doc.exists) {
-                    workout = { id: doc.id, ...doc.data() };
-                    await loadAlunoProfile(workout.alunoId);
-                    renderWorkout();
-                } else {
-                    showEmptyState('Treino não encontrado');
-                }
-            } else {
-                showEmptyState('Nenhum treino foi carregado');
-            }
-        } catch (error) {
-            console.error('Erro:', error);
-            showEmptyState('Erro ao carregar treino');
-        }
-    }
+            console.log('🚀 Initializing workout...');
 
-    async function loadAlunoProfile(alunoId) {
-        try {
-            const doc = await db.collection('alunos').doc(alunoId).get();
-            if (doc.exists) {
-                alunoProfile = { id: doc.id, ...doc.data() };
+            // Get user data
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            if (!userDoc.exists) {
+                showError('Perfil não encontrado');
+                return;
             }
+            userData = userDoc.data();
+
+            // Get treino
+            const params = new URLSearchParams(window.location.search);
+            const treinoId = params.get('treinoId');
+
+            if (!treinoId) {
+                showError('Nenhum treino selecionado');
+                return;
+            }
+
+            const treinoDoc = await db.collection('treinos').doc(treinoId).get();
+            if (!treinoDoc.exists) {
+                showError('Treino não encontrado');
+                return;
+            }
+
+            workout = { id: treinoDoc.id, ...treinoDoc.data() };
+            console.log('✅ Workout loaded:', workout.name);
+
+            renderWorkout();
+            document.getElementById('emptyState').classList.add('hidden');
+
         } catch (error) {
-            console.error('Erro ao carregar perfil:', error);
+            console.error('❌ Init error:', error);
+            showError('Erro ao carregar treino');
         }
     }
 
     function renderWorkout() {
-        document.getElementById('emptyState').style.display = 'none';
-        document.getElementById('headerTitle').textContent = workout.name;
+        document.getElementById('workoutTitle').textContent = workout.name;
+
+        if (!workout.exercises || workout.exercises.length === 0) {
+            showError('Este treino não tem exercícios');
+            return;
+        }
 
         const container = document.getElementById('exercisesContainer');
         container.innerHTML = '';
 
-        if (!workout.exercises || workout.exercises.length === 0) {
-            showEmptyState('Este treino não tem exercícios');
-            return;
-        }
-
         workout.exercises.forEach((exercise, index) => {
-            const card = document.createElement('div');
-            card.className = `exercise-card ${index === currentExerciseIndex ? 'current' : ''}`;
-            card.id = `exercise-${index}`;
-
             const isCompleted = completedExercises.includes(index);
-            if (isCompleted) {
-                card.classList.add('completed');
-            }
+            const isCurrent = index === currentExerciseIndex;
 
-            card.innerHTML = `
-                <div class="exercise-header">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="exercise-number">${index + 1}</div>
-                        <div class="exercise-name">${exercise.name || 'Exercício'}</div>
+            const card = document.createElement('div');
+            card.className = `bg-white rounded-lg shadow-lg p-6 border-l-4 transition ${
+                isCompleted ? 'border-green-600 bg-green-50' : 
+                isCurrent ? 'border-orange-600' : 'border-gray-300'
+            }`;
+
+            let content = `
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center font-black text-white ${
+                        isCompleted ? 'bg-green-600' : 'bg-orange-600'
+                    }">
+                        ${index + 1}
                     </div>
-                    <div class="exercise-status ${isCompleted ? 'completed' : ''}">
-                        ${isCompleted ? '✅ Completo' : 'Em progresso'}
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-black text-gray-900">${exercise.name}</h3>
+                        <span class="text-xs font-bold ${
+                            isCompleted ? 'text-green-600 bg-green-100' : 'text-orange-600 bg-orange-100'
+                        } px-3 py-1 rounded-full">
+                            ${isCompleted ? '✅ Completo' : 'Em progresso'}
+                        </span>
                     </div>
                 </div>
 
-                <div class="exercise-details">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     ${exercise.sets ? `
-                        <div class="detail">
-                            <div class="detail-value">${exercise.sets}</div>
-                            <div class="detail-label">Séries</div>
+                        <div class="bg-gray-100 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-black text-orange-600">${exercise.sets}</div>
+                            <div class="text-xs text-gray-600 font-bold mt-1">SÉRIES</div>
                         </div>
                     ` : ''}
                     ${exercise.reps ? `
-                        <div class="detail">
-                            <div class="detail-value">${exercise.reps}</div>
-                            <div class="detail-label">Repetições</div>
+                        <div class="bg-gray-100 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-black text-orange-600">${exercise.reps}</div>
+                            <div class="text-xs text-gray-600 font-bold mt-1">REPS</div>
                         </div>
                     ` : ''}
                     ${exercise.weight ? `
-                        <div class="detail">
-                            <div class="detail-value">${exercise.weight}</div>
-                            <div class="detail-label">Peso (kg)</div>
+                        <div class="bg-gray-100 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-black text-orange-600">${exercise.weight}</div>
+                            <div class="text-xs text-gray-600 font-bold mt-1">KG</div>
                         </div>
                     ` : ''}
                     ${exercise.rest ? `
-                        <div class="detail">
-                            <div class="detail-value">${exercise.rest}</div>
-                            <div class="detail-label">Descanso (s)</div>
+                        <div class="bg-gray-100 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-black text-orange-600">${exercise.rest}</div>
+                            <div class="text-xs text-gray-600 font-bold mt-1">SEG DESCANSO</div>
                         </div>
                     ` : ''}
                 </div>
-
-                ${index === currentExerciseIndex && !isCompleted ? `
-                    <div class="sets-section">
-                        <div class="set-counter">
-                            <span class="set-label">Repetições realizadas:</span>
-                            <input type="number" class="reps-input" id="repsInput-${index}" min="0" value="${exercise.reps || 0}" placeholder="Reps">
-                        </div>
-                        <div class="set-actions">
-                            <button class="btn-small secondary" onclick="skipExercise(${index})">Pular</button>
-                            <button class="btn-small success" onclick="completeExercise(${index})">✅ Completo</button>
-                        </div>
-                    </div>
-
-                    ${exercise.rest ? `
-                        <div class="rest-timer" id="restTimer-${index}" style="display: none;">
-                            <div class="timer-label">Descanso</div>
-                            <div class="timer-display" id="timerDisplay-${index}">${exercise.rest}s</div>
-                            <div class="timer-action">
-                                <button class="btn-small secondary" onclick="skipRest(${index})">Pular Descanso</button>
-                                <button class="btn-small secondary" onclick="nextExercise(${index})">Próximo</button>
-                            </div>
-                        </div>
-                    ` : ''}
-
-                    <div class="exercise-actions">
-                        ${index > 0 ? `
-                            <button class="btn-secondary" onclick="previousExercise()">← Anterior</button>
-                        ` : ''}
-                        <button class="btn-primary" onclick="completeExercise(${index})">✅ Concluir Exercício</button>
-                    </div>
-                ` : ''}
             `;
 
+            if (isCurrent && !isCompleted) {
+                content += `
+                    <div class="bg-orange-50 border-2 border-orange-300 rounded-lg p-4 mb-4">
+                        <div class="text-sm font-bold text-gray-900 mb-3">Reps Realizadas:</div>
+                        <input type="number" id="repsInput-${index}" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none mb-4" min="0" value="${exercise.reps || 0}">
+                        <div class="flex gap-2">
+                            <button onclick="completeExercise(${index})" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-lg font-bold transition">
+                                ✅ Completo
+                            </button>
+                            <button onclick="skipExercise(${index})" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white px-4 py-3 rounded-lg font-bold transition">
+                                ⏭️ Pular
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        ${index > 0 ? `
+                            <button onclick="previousExercise()" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white px-4 py-3 rounded-lg font-bold transition">
+                                ← Anterior
+                            </button>
+                        ` : ''}
+                        <button onclick="completeExercise(${index})" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-bold transition">
+                            ✅ Concluir
+                        </button>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = content;
             container.appendChild(card);
         });
 
@@ -844,27 +242,21 @@
 
     function completeExercise(index) {
         if (completedExercises.includes(index)) {
-            showToast('✅ Exercício já foi completado!');
+            showToast('✅ Já foi completado!');
             return;
         }
 
         completedExercises.push(index);
-        
         const exercise = workout.exercises[index];
         const points = 100 + (exercise.sets || 3) * 10 + (exercise.reps || 10) * 2;
         totalPoints += points;
 
         showMotivation(points);
-        playSuccessSound();
         createConfetti();
 
         if (index === workout.exercises.length - 1) {
-            // Último exercício - completa treino
-            setTimeout(() => {
-                completeWorkout();
-            }, 2000);
+            setTimeout(() => completeWorkout(), 2000);
         } else {
-            // Próximo exercício
             currentExerciseIndex = index + 1;
             renderWorkout();
         }
@@ -872,9 +264,8 @@
 
     function skipExercise(index) {
         if (completedExercises.includes(index)) return;
-
         completedExercises.push(index);
-        
+
         if (index === workout.exercises.length - 1) {
             completeWorkout();
         } else {
@@ -883,28 +274,11 @@
         }
     }
 
-    function nextExercise(index) {
-        if (index < workout.exercises.length - 1) {
-            currentExerciseIndex = index + 1;
-            renderWorkout();
-        } else {
-            completeWorkout();
-        }
-    }
-
     function previousExercise() {
         if (currentExerciseIndex > 0) {
-            currentExerciseIndex -= 1;
+            currentExerciseIndex--;
             renderWorkout();
         }
-    }
-
-    function skipRest(index) {
-        const timer = document.getElementById(`restTimer-${index}`);
-        if (timer) {
-            timer.style.display = 'none';
-        }
-        clearInterval(exerciseTimers[index]);
     }
 
     function updateProgress() {
@@ -912,59 +286,48 @@
         const completed = completedExercises.length;
         const percentage = (completed / total) * 100;
 
-        document.getElementById('progressFill').style.width = percentage + '%';
+        document.getElementById('progressBar').style.width = percentage + '%';
         document.getElementById('exerciseCounter').textContent = `${completed}/${total}`;
-        document.getElementById('pointsCounter').textContent = `⭐ ${totalPoints}pts`;
+        document.getElementById('pointsCounter').textContent = `⭐ ${totalPoints}`;
     }
 
     async function completeWorkout() {
         try {
-            // Calcular pontos extras
+            console.log('🏆 Completing workout...');
+
             const basePoints = totalPoints;
             const completionBonus = completedExercises.length === workout.exercises.length ? 200 : 0;
             const finalPoints = basePoints + completionBonus;
 
-            // Salvar workout completo
-            const alunoDocId = alunoProfile?.id;
-            if (alunoDocId) {
-                await db.collection('workouts_completed').add({
-                    alunoId: alunoDocId,
-                    treinoId: workout.id,
-                    treinoName: workout.name,
-                    exercises_done: completedExercises.length,
-                    totalExercises: workout.exercises.length,
-                    points: finalPoints,
-                    completed_at: new Date(),
-                    duration: Math.floor((Date.now() - performance.now()) / 1000)
-                });
+            // Save to Firestore
+            await db.collection('workouts_completed').add({
+                alunoId: currentUser.uid,
+                treinoId: workout.id,
+                treinoName: workout.name,
+                exercises_done: completedExercises.length,
+                totalExercises: workout.exercises.length,
+                points: finalPoints,
+                completed_at: new Date()
+            });
 
-                // Atualizar perfil do aluno
-                const currentData = await db.collection('alunos').doc(alunoDocId).get();
-                const gamif = currentData.data().gamification || {};
+            // Update user gamification
+            const newPoints = (userData.gamification?.totalPoints || 0) + finalPoints;
+            const newWorkouts = (userData.gamification?.totalWorkouts || 0) + 1;
+            const newStreak = (userData.gamification?.streak || 0) + 1;
 
-                const newLevel = calculateLevel(gamif.totalPoints + finalPoints);
-                const newStreak = calculateStreak(gamif.streak);
-                const newBadges = checkBadges(gamif, newStreak);
+            await db.collection('users').doc(currentUser.uid).update({
+                'gamification.totalPoints': newPoints,
+                'gamification.totalWorkouts': newWorkouts,
+                'gamification.streak': newStreak,
+                'gamification.level': calculateLevel(newPoints),
+                updatedAt: new Date()
+            });
 
-                await db.collection('alunos').doc(alunoDocId).update({
-                    'gamification.totalPoints': (gamif.totalPoints || 0) + finalPoints,
-                    'gamification.totalWorkouts': (gamif.totalWorkouts || 0) + 1,
-                    'gamification.streak': newStreak,
-                    'gamification.badges': newBadges,
-                    'gamification.level': newLevel,
-                    updatedAt: new Date()
-                });
-            }
-
-            // Mostrar modal de conclusão
+            console.log('✅ Workout completed!');
             showCompletionModal(finalPoints, completionBonus);
 
-            // Confete final
-            createConfetti();
-            playVictorySound();
-
         } catch (error) {
-            console.error('Erro ao completar treino:', error);
+            console.error('❌ Error completing workout:', error);
             showToast('❌ Erro ao salvar treino');
         }
     }
@@ -976,110 +339,74 @@
         return 'Novato';
     }
 
-    function calculateStreak(currentStreak) {
-        // Simular: se não treinou no mesmo dia, reinicia
-        return (currentStreak || 0) + 1;
-    }
-
-    function checkBadges(gamif, streak) {
-        const badges = gamif.badges || [];
-        const workouts = gamif.totalWorkouts || 0;
-
-        if (workouts === 1 && !badges.includes('first')) {
-            badges.push('first');
+    function showCompletionModal(finalPoints, bonus) {
+        let bonusText = '';
+        if (bonus > 0) {
+            bonusText = `<br><span class="text-green-600 font-bold">+ ${bonus} pontos de bônus!</span>`;
         }
-        if (streak >= 7 && !badges.includes('week7')) {
-            badges.push('week7');
-        }
-        if (streak >= 30 && !badges.includes('month30')) {
-            badges.push('month30');
+        if (completedExercises.length < workout.exercises.length) {
+            bonusText += `<br><span class="text-yellow-600 font-bold">Complete todos para ganhar bônus!</span>`;
         }
 
-        return badges;
-    }
-
-    function showCompletionModal(points, bonus) {
-        document.getElementById('completionIcon').textContent = '🏆';
-        document.getElementById('completionTitle').textContent = 'Parabéns!';
-        document.getElementById('completionMessage').textContent = 'Você completou o treino!';
-        document.getElementById('totalPoints').textContent = `+${points}`;
-        document.getElementById('streakValue').textContent = alunoProfile?.gamification?.streak || 1;
-
-        document.getElementById('completionModal').classList.add('show');
+        document.getElementById('totalPoints').textContent = `+${finalPoints}`;
+        document.getElementById('bonusText').innerHTML = bonusText;
+        document.getElementById('completionModal').classList.remove('hidden');
     }
 
     function showMotivation(points) {
         const msg = motivations[Math.floor(Math.random() * motivations.length)];
-        showToast(`${msg} +${points} pontos!`);
-    }
-
-    function showEmptyState(msg) {
-        document.getElementById('emptyState').style.display = 'block';
-        document.querySelector('.empty-title').textContent = msg;
+        showToast(`${msg} +${points} pts!`);
     }
 
     function createConfetti() {
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const colors = ['#E07800', '#FF9900', '#FFD700', '#4caf50'];
+
         for (let i = 0; i < 50; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + '%';
-            confetti.style.background = ['#E07800', '#FF9900', '#FFD700', '#4caf50'][Math.floor(Math.random() * 4)];
-            confetti.style.animation = `fall ${2 + Math.random() * 1}s ease-in forwards`;
-
-            document.body.appendChild(confetti);
-
-            setTimeout(() => confetti.remove(), 3000);
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: -10,
+                size: Math.random() * 8 + 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                vx: (Math.random() - 0.5) * 8,
+                vy: Math.random() * 5 + 5,
+                rotation: Math.random() * Math.PI * 2,
+                vr: Math.random() * 0.2 - 0.1
+            });
         }
 
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes fall {
-                to {
-                    transform: translateY(100vh) rotateZ(360deg);
-                    opacity: 0;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p, i) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1;
+                p.rotation += p.vr;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+
+                if (p.y > canvas.height) {
+                    particles.splice(i, 1);
                 }
+            });
+
+            if (particles.length > 0) {
+                requestAnimationFrame(animate);
             }
-        `;
-        document.head.appendChild(style);
-    }
+        }
 
-    function playSuccessSound() {
-        // Som simples usando Web Audio API
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-
-        oscillator.connect(gain);
-        gain.connect(audioContext.destination);
-
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-
-        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.1);
-    }
-
-    function playVictorySound() {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const notes = [523.25, 659.25, 783.99]; // C, E, G
-
-        notes.forEach((freq, i) => {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.2, audioContext.currentTime + i * 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.1 + 0.2);
-
-            osc.start(audioContext.currentTime + i * 0.1);
-            osc.stop(audioContext.currentTime + i * 0.1 + 0.2);
-        });
+        animate();
     }
 
     function continueToApp() {
@@ -1090,7 +417,7 @@
         completedExercises = [];
         currentExerciseIndex = 0;
         totalPoints = 0;
-        document.getElementById('completionModal').classList.remove('show');
+        document.getElementById('completionModal').classList.add('hidden');
         renderWorkout();
     }
 
@@ -1100,9 +427,22 @@
         }
     }
 
+    function showError(msg) {
+        document.getElementById('emptyState').innerHTML = `
+            <div class="text-center py-16">
+                <div class="text-6xl mb-4">❌</div>
+                <p class="text-gray-600 text-lg mb-4">${msg}</p>
+                <button onclick="window.location.href='app.html'" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-bold">
+                    Voltar
+                </button>
+            </div>
+        `;
+        document.getElementById('emptyState').classList.remove('hidden');
+    }
+
     function showToast(msg) {
         const toast = document.createElement('div');
-        toast.className = 'toast';
+        toast.className = 'fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce';
         toast.textContent = msg;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
