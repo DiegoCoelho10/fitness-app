@@ -1,76 +1,88 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../context/authStore'
-import { Sidebar } from './Sidebar'
-import { NotificationCenter } from '../components/NotificationCenter'
+import { NotificationCenter } from './NotificationCenter'
 import './Layout.css'
 
 export function Layout({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
+  const { user, userRole, logout } = useAuthStore()
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/login')
+  const handleLogout = () => {
+    if (window.confirm('Tem certeza que deseja sair?')) {
+      logout()
+      navigate('/login')
+    }
   }
+
+  const isActive = (path) => location.pathname === path
 
   return (
     <div className="layout">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {/* Header */}
+      <header className="layout-header">
+        <div className="header-content">
+          <Link to="/dashboard" className="logo">
+            <span className="logo-icon">💪</span>
+            <span className="logo-text">FITNESS</span>
+          </Link>
 
-      <div className="layout-main">
-        {/* Header */}
-        <header className="layout-header">
-          <div className="header-left">
-            <button
-              className="menu-toggle"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              ☰
+          <nav className="header-nav">
+            {userRole === 'personal_trainer' ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/students"
+                  className={`nav-link ${isActive('/students') ? 'active' : ''}`}
+                >
+                  Alunos
+                </Link>
+                <Link
+                  to="/ranking"
+                  className={`nav-link ${isActive('/ranking') ? 'active' : ''}`}
+                >
+                  Ranking
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/dashboard"
+                  className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+                >
+                  Meu Treino
+                </Link>
+              </>
+            )}
+          </nav>
+
+          <div className="header-actions">
+            <NotificationCenter />
+            <Link to="/profile" className="header-avatar">
+              👤
+            </Link>
+            <button onClick={handleLogout} className="btn-logout">
+              Sair
             </button>
-            <div className="logo">FIT</div>
           </div>
+        </div>
+      </header>
 
-          <div className="header-right">
-            <NotificationCenter userId={user?.uid} />
-            
-            <div className="user-menu">
-              <button
-                className="user-avatar-btn"
-                onClick={() => navigate('/profile')}
-                title={user?.email}
-              >
-                👤
-              </button>
-            </div>
+      {/* Main Content */}
+      <main className="layout-main">
+        {children}
+      </main>
 
-            <button
-              className="logout-btn"
-              onClick={handleLogout}
-              title="Sair"
-            >
-              🚪
-            </button>
-          </div>
-        </header>
-
-        {/* Content */}
-        <main className="layout-content">
-          {children}
-        </main>
-
-        {/* Footer */}
-        <footer className="layout-footer">
-          <p>© 2024 FIT - Seu App de Treino com Gamificação</p>
-          <p>Versão 1.0.0</p>
-        </footer>
-      </div>
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
-      )}
+      {/* Footer */}
+      <footer className="layout-footer">
+        <p>&copy; 2026 Fitness App. Todos os direitos reservados.</p>
+      </footer>
     </div>
   )
 }
