@@ -96,6 +96,19 @@
   display: block;
 }
 
+.podium-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px auto;
+  font-size: 40px;
+  color: white;
+}
+
 .podium-item h3 {
   margin: 16px 0 8px 0;
   font-size: 18px;
@@ -166,7 +179,7 @@
   align-items: center;
 }
 
-.student-info-compact {
+.student-info {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -231,7 +244,7 @@
   color: #FF9900;
 }
 
-.stat-badge .icon {
+.stat-badge span {
   font-size: 16px;
 }
 
@@ -251,7 +264,7 @@
 
 .badges-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 16px;
 }
 
@@ -300,11 +313,6 @@
   .ranking-header-table,
   .ranking-item {
     grid-template-columns: 1fr;
-  }
-
-  .col-stat {
-    display: flex;
-    justify-content: space-between;
   }
 
   .ranking-header-table {
