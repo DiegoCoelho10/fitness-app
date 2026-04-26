@@ -13,21 +13,17 @@ import { Ranking } from './pages/Ranking'
 import './App.css'
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuthStore()
+  const { loading } = useAuthStore()
 
   if (loading) {
     return <div className="loading-screen">Carregando...</div>
-  }
-
-  if (!user) {
-    return <Navigate to="/login" />
   }
 
   return <Layout>{children}</Layout>
 }
 
 function App() {
-  const { user, loading, checkAuth } = useAuthStore()
+  const { loading, checkAuth } = useAuthStore()
 
   useEffect(() => {
     checkAuth()
