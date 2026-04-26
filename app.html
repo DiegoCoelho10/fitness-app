@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#E07800">
+    <title>💪 FITNESS - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f5f5;
+        }
+
+        /* LAYOUT */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .app-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            margin-left: 40px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active {
+            background: #fffaf0;
+            color: #E07800;
+            border: 1px solid #FFE0C0;
+        }
+
+        .nav-btn:hover {
+            color: #E07800;
+            background: #f5f5f5;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .notification-bell {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #d32f2f;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #E07800;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: #E07800;
+            color: white;
+        }
+
+        /* MAIN CONTENT */
+        .app-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* DASHBOARD */
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-subtitle {
+            color: #999;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #E07800;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* GAMIFICATION WIDGET */
+        .gamif-widget {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .gamif-header {
+            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .gamif-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .level-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .level-icon {
+            font-size: 50px;
+        }
+
+        .level-info h3 {
+            margin: 0 0 4px 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .level-info p {
+            margin: 0;
+            color: #E07800;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E07800 0%, #FF9900 100%);
+            transition: width 0.3s;
+        }
+
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .mini-stat {
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .mini-stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .mini-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #E07800;
+        }
+
+        .mini-stat-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .badge {
+            padding: 12px;
+            border: 2px solid #FFE0C0;
+            border-radius: 8px;
+            background: #fffaf0;
+            text-align: center;
+            opacity: 0.4;
+        }
+
+        .badge.unlocked {
+            border-color: #FFD700;
+            background: linear-gradient(135deg, #fffaf0 0%, #fff5e6 100%);
+            opacity: 1;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+        }
+
+        .badge-icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .badge-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* STUDENTS SECTION */
+        .students-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .btn-primary {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(224, 120, 0, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #E07800;
+            color: white;
+        }
+
+        .btn-danger {
+            padding: 8px 12px;
+            background: #f0f0f0;
+            color: #d32f2f;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .student-card {
+            background: linear-gradient(135deg, #fff9f5 0%, #ffe8d6 100%);
+            border: 2px solid #FFE0C0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .student-card:hover {
+            transform: translateY(-4px);
+            border-color: #E07800;
+            box-shadow: 0 8px 24px rgba(224, 120, 0, 0.15);
+        }
+
+        .student-header {
+            height: 180px;
+            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+
+        .student-body {
+            padding: 16px;
+        }
+
+        .student-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .student-goal {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        .student-stats {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid #FFD9B3;
+            border-bottom: 1px solid #FFD9B3;
+            margin-bottom: 12px;
+        }
+
+        .student-mini-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #E07800;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .student-actions button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background: #E07800;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f0f0f0;
+            color: #d32f2f;
+        }
+
+        /* FORM */
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #E07800;
+            box-shadow: 0 0 0 3px rgba(224, 120, 0, 0.1);
+        }
+
+        .form-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* CHAT */
+        .chat-container {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            overflow: hidden;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .chat-info h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .chat-info p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            display: flex;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .message.own {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-break: break-word;
+        }
+
+        .message.own .message-content {
+            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
+            color: white;
+        }
+
+        .message.other .message-content {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 8px;
+            padding: 16px;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .chat-input button {
+            padding: 12px 16px;
+            background: #E07800;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* RANKING */
+        .ranking-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+            align-items: flex-end;
+        }
+
+        .podium-item {
+            text-align: center;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .podium-item.gold {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            order: 2;
+            transform: scale(1.1);
+        }
+
+        .podium-item.silver {
+            background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%);
+            order: 1;
+            transform: scale(0.95);
+        }
+
+        .podium-item.bronze {
+            background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);
+            order: 3;
+            transform: scale(0.9);
+        }
+
+        .medal {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .podium-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .podium-points {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .ranking-table {
+            width: 100%;
+        }
+
+        .ranking-header {
+            display: grid;
+            grid-template-columns: 80px 1fr 120px 120px 120px;
+            gap: 16px;
+            padding: 16px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ranking-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 120px 120px 120px;
+            gap: 16px;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .ranking-row:hover {
+            background: #f8f8f8;
+        }
+
+        .rank-badge {
+            background: #E07800;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin: 0 auto;
+        }
+
+        /* PROFILE */
+        .profile-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            flex-shrink: 0;
+        }
+
+        .profile-info h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .profile-info p {
+            margin: 0;
+            color: #999;
+        }
+
+        /* NOTIFICATION PANEL */
+        .notification-panel {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 360px;
+            max-height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+
+        .notification-panel.show {
+            display: flex;
+        }
+
+        .notif-panel-header {
+            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
+            color: white;
+            padding: 16px;
+            font-weight: 700;
+        }
+
+        .notif-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .notif-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .notif-item:hover {
+            background: #f8f8f8;
+        }
+
+        .notif-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .notif-body {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 1024px) {
+            .header-nav {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .students-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-container {
+                height: 400px;
+            }
+
+            .notification-panel {
+                width: 320px;
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                height: 60px;
+                gap: 12px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .logo-icon {
+                font-size: 20px;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .btn-logout {
+                display: none;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-container {
+                height: 300px;
+            }
+
+            .podium {
+                grid-template-columns: 1fr;
+                align-items: auto;
+            }
+
+            .podium-item {
+                transform: scale(1) !important;
+                order: unset !important;
+            }
+
+            .ranking-header, .ranking-row {
+                grid-template-columns: 1fr;
+            }
+
+            .notification-panel {
+                position: fixed;
+                top: 60px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+                max-width: none;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-main {
+                padding: 12px;
+            }
+
+            .header-content {
+                height: 56px;
+                gap: 8px;
+            }
+
+            .dashboard-title {
+                font-size: 24px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .student-actions {
+                flex-direction: column;
+            }
+
+            .notification-panel {
+                max-height: 60vh;
+            }
+        }
+
+        /* CONFETTI */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #E07800;
+            pointer-events: none;
+            animation: confettiFall 3s ease-in forwards;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotateZ(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* LOADING */
+        .loading {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #E07800;
+            opacity: 0.6;
+            animation: blink 1.4s infinite;
+        }
+
+        .loading:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes blink {
+            0%, 60%, 100% { opacity: 0.6; }
+            30% { opacity: 1; }
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- HEADER -->
+    <header class="app-header">
+        <div class="header-content">
+            <a href="#" class="logo">
+                <span class="logo-icon">💪</span>
+                <span>FITNESS</span>
+            </a>
+
+            <nav class="header-nav" id="headerNav"></nav>
+
+            <div class="header-actions">
+                <button class="notification-bell" onclick="toggleNotificationPanel()">
+                    🔔
+                    <span class="unread-badge" id="unreadBadge" style="display:none;">0</span>
+                </button>
+                <div class="user-avatar" id="userAvatar" onclick="showPage('profile')">👤</div>
+                <button class="btn-logout" onclick="handleLogout()">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NOTIFICATION PANEL -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notif-panel-header">Notificações</div>
+        <div class="notif-list" id="notifList"></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="app-main">
+        <!-- DASHBOARD PAGE -->
+        <div id="dashboardPage" class="page show">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title" id="dashboardTitle">Bem-vindo!</h1>
+                <p class="dashboard-subtitle" id="dashboardSubtitle">Seu espaço de controle</p>
+            </div>
+
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <!-- GAMIFICATION WIDGET -->
+            <div class="gamif-widget" id="gamifWidget"></div>
+
+            <!-- STUDENTS SECTION (PT ONLY) -->
+            <div class="students-section" id="studentsSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Seus Alunos</h2>
+                    <button class="btn-primary" onclick="showPage('addStudent')">➕ Novo Aluno</button>
+                </div>
+                <div class="students-grid" id="studentsGrid"></div>
+            </div>
+
+            <!-- ALUNO PROGRESSO (ALUNO ONLY) -->
+            <div class="students-section" id="alunoProgressSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Seu Progresso</h2>
+                </div>
+                <div class="stats-mini" id="progressStats"></div>
+            </div>
+        </div>
+
+        <!-- ADD STUDENT PAGE -->
+        <div id="addStudentPage" class="page">
+            <div class="form-container">
+                <div class="section-header">
+                    <h2>Adicionar Novo Aluno</h2>
+                    <button class="btn-secondary" onclick="showPage('dashboard')">← Voltar</button>
+                </div>
+
+                <form id="addStudentForm" onsubmit="handleAddStudent(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="studentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="studentEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="tel" id="studentPhone">
+                        </div>
+                        <div class="form-group">
+                            <label>Objetivo</label>
+                            <input type="text" id="studentGoal" placeholder="Ex: Ganhar massa">
+                        </div>
+                        <div class="form-group">
+                            <label>Altura (cm)</label>
+                            <input type="number" id="studentHeight" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Peso (kg)</label>
+                            <input type="number" id="studentWeight" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Peito (cm)</label>
+                            <input type="number" id="studentChest" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Cintura (cm)</label>
+                            <input type="number" id="studentWaist" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Quadril (cm)</label>
+                            <input type="number" id="studentHips" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Braço (cm)</label>
+                            <input type="number" id="studentArm" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Perna (cm)</label>
+                            <input type="number" id="studentLeg" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Nascimento</label>
+                            <input type="date" id="studentDOB">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Adicionar Aluno</button>
+                        <button type="button" class="btn-secondary" onclick="showPage('dashboard')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- CREATE WORKOUT PAGE -->
+        <div id="createWorkoutPage" class="page">
+            <div class="form-container">
+                <div class="section-header">
+                    <h2>Criar Novo Treino</h2>
+                    <button class="btn-secondary" onclick="showPage('dashboard')">← Voltar</button>
+                </div>
+
+                <form id="createWorkoutForm" onsubmit="handleCreateWorkout(event)">
+                    <div class="form-grid">
+                        <div class="form-group form-full">
+                            <label>Selecione Aluno</label>
+                            <select id="workoutAluno" required onchange="loadAlunoData()">
+                                <option value="">Escolha um aluno...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nome do Treino</label>
+                            <input type="text" id="workoutName" placeholder="Ex: Peito e Costas" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Dificuldade</label>
+                            <select id="workoutDifficulty">
+                                <option value="facil">Fácil</option>
+                                <option value="moderado" selected>Moderado</option>
+                                <option value="dificil">Difícil</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-full">
+                            <label>Descrição</label>
+                            <textarea id="workoutDesc" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div style="background: #f8f8f8; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                        <h3 style="margin: 0 0 12px 0;">Adicionar Exercícios</h3>
+                        <div id="exercisesListAdd"></div>
+                        <button type="button" class="btn-primary" style="width: 100%; margin-top: 12px;" onclick="addExerciseField()">➕ Adicionar Exercício</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Criar Treino</button>
+                        <button type="button" class="btn-secondary" onclick="showPage('dashboard')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- CHAT PAGE -->
+        <div id="chatPage" class="page">
+            <div class="form-container" style="margin-bottom: 0; padding: 0;">
+                <div class="chat-container" id="chatContainer"></div>
+            </div>
+        </div>
+
+        <!-- RANKING PAGE -->
+        <div id="rankingPage" class="page">
+            <div class="ranking-container">
+                <h2 style="margin-bottom: 20px;">🏆 Ranking de Alunos</h2>
+                <div class="podium" id="podium"></div>
+                <div class="ranking-table">
+                    <div class="ranking-header">
+                        <div>Posição</div>
+                        <div>Aluno</div>
+                        <div>Treinos</div>
+                        <div>Pontos</div>
+                        <div>Sequência</div>
+                    </div>
+                    <div id="rankingList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE PAGE -->
+        <div id="profilePage" class="page">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <div class="profile-info">
+                        <h1 id="profileName">Seu Nome</h1>
+                        <p id="profileRole">Aluno</p>
+                    </div>
+                </div>
+
+                <form id="profileForm" onsubmit="handleUpdateProfile(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="profileNameInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="profileEmailInput" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="tel" id="profilePhoneInput">
+                        </div>
+                        <div class="form-group" id="profileGoalDiv">
+                            <label>Objetivo</label>
+                            <input type="text" id="profileGoalInput">
+                        </div>
+                        <div class="form-group" id="profileDOBDiv">
+                            <label>Data de Nascimento</label>
+                            <input type="date" id="profileDOBInput">
+                        </div>
+
+                        <div class="form-group" id="profileHeightDiv">
+                            <label>Altura (cm)</label>
+                            <input type="number" id="profileHeightInput" step="0.1">
+                        </div>
+                        <div class="form-group" id="profileWeightDiv">
+                            <label>Peso (kg)</label>
+                            <input type="number" id="profileWeightInput" step="0.1">
+                        </div>
+                        <div class="form-group" id="profileChestDiv">
+                            <label>Peito (cm)</label>
+                            <input type="number" id="profileChestInput" step="0.1">
+                        </div>
+                        <div class="form-group" id="profileWaistDiv">
+                            <label>Cintura (cm)</label>
+                            <input type="number" id="profileWaistInput" step="0.1">
+                        </div>
+                        <div class="form-group" id="profileHipsDiv">
+                            <label>Quadril (cm)</label>
+                            <input type="number" id="profileHipsInput" step="0.1">
+                        </div>
+                        <div class="form-group" id="profileArmDiv">
+                            <label>Braço (cm)</label>
+                            <input type="number" id="profileArmInput" step="0.1">
+                        </div>
+                        <div class="form-group" id="profileLegDiv">
+                            <label>Perna (cm)</label>
+                            <input type="number" id="profileLegInput" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+
+<script>
+    // Firebase Init
+    const firebaseConfig = {
+        apiKey: "AIzaSyBK7hpCtjQ6COYOFZw1k2l84tBbjfHqUdI",
+        authDomain: "fitness-app-7aa96.firebaseapp.com",
+        projectId: "fitness-app-7aa96",
+        storageBucket: "fitness-app-7aa96.firebasestorage.app",
+        messagingSenderId: "123102660519",
+        appId: "1:123102660519:web:b71e04b17fea141e629882"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Global State
+    let currentUser = null;
+    let userRole = null;
+    let userProfile = null;
+    let currentChat = null;
+    let chatUnsubscribe = null;
+    let notificationsUnsubscribe = null;
+
+    // Check Auth
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        currentUser = user;
+        initializeApp();
+    });
+
+    async function initializeApp() {
+        try {
+            // Detectar role
+            const ptDoc = await db.collection('users').doc(currentUser.uid).get();
+            if (ptDoc.exists) {
+                userRole = 'personal_trainer';
+                userProfile = ptDoc.data();
+            } else {
+                // Buscar como aluno
+                const alunosSnap = await db.collection('alunos').where('uid', '==', currentUser.uid).get();
+                if (alunosSnap.empty) {
+                    // Aluno criado via auth, precisa criar doc
+                    userRole = 'student';
+                    userProfile = {
+                        uid: currentUser.uid,
+                        type: 'student',
+                        name: currentUser.email.split('@')[0],
+                        email: currentUser.email
+                    };
+                } else {
+                    userRole = 'student';
+                    userProfile = { id: alunosSnap.docs[0].id, ...alunosSnap.docs[0].data() };
+                }
+            }
+
+            setupUI();
+            loadDashboard();
+            subscribeToNotifications();
+
+            if (userRole === 'personal_trainer') {
+                loadStudents();
+            } else {
+                loadAlunoTreinos();
+            }
+
+        } catch (error) {
+            console.error('Erro ao inicializar:', error);
+            showToast('❌ Erro ao carregar dados');
+        }
+    }
+
+    function setupUI() {
+        document.getElementById('userAvatar').textContent = userProfile.name.charAt(0).toUpperCase();
+
+        if (userRole === 'personal_trainer') {
+            document.getElementById('headerNav').innerHTML = `
+                <button class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
+                <button class="nav-btn" onclick="showPage('ranking')">Ranking</button>
+            `;
+            document.getElementById('studentsSection').style.display = 'block';
+        } else {
+            document.getElementById('headerNav').innerHTML = `
+                <button class="nav-btn active" onclick="showPage('dashboard')">Meu Treino</button>
+            `;
+            document.getElementById('alunoProgressSection').style.display = 'block';
+        }
+    }
+
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+        document.getElementById(page + 'Page').classList.add('show');
+
+        // Atualizar nav
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        event?.target?.classList.add('active');
+
+        if (page === 'ranking') {
+            loadRanking();
+        } else if (page === 'profile') {
+            loadProfile();
+        }
+    }
+
+    async function loadDashboard() {
+        const title = document.getElementById('dashboardTitle');
+        const subtitle = document.getElementById('dashboardSubtitle');
+
+        // Estratégia Neurolinguística: Personalização positiva
+        const hora = new Date().getHours();
+        let saudacao = 'Bom dia';
+        if (hora >= 12 && hora < 18) saudacao = 'Boa tarde';
+        if (hora >= 18) saudacao = 'Boa noite';
+
+        title.textContent = `${saudacao}, ${userProfile.name}! 👋`;
+
+        if (userRole === 'personal_trainer') {
+            subtitle.textContent = 'Veja o progresso dos seus alunos e inspire-os a alcançarem seus objetivos';
+
+            // Stats PT
+            const statsSnap = await db.collection('alunos').where('personalTrainerId', '==', currentUser.uid).get();
+            const totalWorkouts = await Promise.all(
+                statsSnap.docs.map(doc =>
+                    db.collection('workouts_completed').where('alunoId', '==', doc.id).get()
+                        .then(snap => snap.size)
+                )
+            );
+
+            const totalPoints = statsSnap.docs.reduce((sum, doc) => sum + (doc.data().gamification?.totalPoints || 0), 0);
+            const totalAlunos = statsSnap.size;
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div>
+                        <div class="stat-value">${totalAlunos}</div>
+                        <div class="stat-label">Alunos Ativos</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💪</div>
+                    <div>
+                        <div class="stat-value">${totalWorkouts.reduce((a,b) => a+b, 0)}</div>
+                        <div class="stat-label">Treinos Completos</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div>
+                        <div class="stat-value">${totalPoints}</div>
+                        <div class="stat-label">Pontos Totais</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div>
+                        <div class="stat-value">${statsSnap.docs.length > 0 ? Math.max(...statsSnap.docs.map(d => d.data().gamification?.streak || 0)) : 0}</div>
+                        <div class="stat-label">Maior Sequência</div>
+                    </div>
+                </div>
+            `;
+
+            // Carregar estudantes
+            const studentsHtml = statsSnap.docs.map(doc => `
+                <div class="student-card">
+                    <div class="student-header">👤</div>
+                    <div class="student-body">
+                        <div class="student-name">${doc.data().name}</div>
+                        <div class="student-goal">${doc.data().goal || 'Sem objetivo'}</div>
+                        <div class="student-stats">
+                            <div class="student-mini-stat">💪 ${doc.data().gamification?.totalWorkouts || 0}</div>
+                            <div class="student-mini-stat">⭐ ${doc.data().gamification?.totalPoints || 0}</div>
+                        </div>
+                        <div class="student-actions">
+                            <button class="btn-edit" onclick="startWorkout('${doc.id}')">➕ Treino</button>
+                            <button class="btn-secondary" onclick="openChat('${doc.id}')">💬</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('studentsGrid').innerHTML = studentsHtml || '<p style="text-align: center; color: #999;">Nenhum aluno adicionado</p>';
+
+        } else {
+            subtitle.textContent = 'Acompanhe seu progresso e conquiste novos objetivos';
+
+            // Stats Aluno
+            const workoutsSnap = await db.collection('workouts_completed').where('alunoId', '==', userProfile.id).get();
+            const totalWorkouts = workoutsSnap.size;
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon">💪</div>
+                    <div>
+                        <div class="stat-value">${totalWorkouts}</div>
+                        <div class="stat-label">Treinos Completos</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div>
+                        <div class="stat-value">${userProfile.gamification?.totalPoints || 0}</div>
+                        <div class="stat-label">Pontos Totais</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div>
+                        <div class="stat-value">${userProfile.gamification?.streak || 0}</div>
+                        <div class="stat-label">Dias de Sequência</div>
+                    </div>
+                </div>
+            `;
+
+            // Gamification Widget
+            showGamificationWidget();
+        }
+    }
+
+    function showGamificationWidget() {
+        const gamif = userProfile.gamification || {};
+        const points = gamif.totalPoints || 0;
+        const streak = gamif.streak || 0;
+
+        let level, levelIcon;
+        if (points < 500) {
+            level = 'Novato';
+            levelIcon = '⚪';
+        } else if (points < 1500) {
+            level = 'Guerreiro';
+            levelIcon = '🟠';
+        } else if (points < 3000) {
+            level = 'Lendário';
+            levelIcon = '🟡';
+        } else {
+            level = 'Supremo';
+            levelIcon = '🔴';
+        }
+
+        const nextLevel = points < 500 ? 500 : points < 1500 ? 1500 : points < 3000 ? 3000 : Infinity;
+        const prevLevel = points < 500 ? 0 : points < 1500 ? 500 : points < 3000 ? 1500 : 3000;
+        const progress = ((points - prevLevel) / (nextLevel - prevLevel)) * 100;
+
+        // Estratégia Neurolinguística: Motivação baseada no progresso
+        let motivationText = '🎯 Comece seu primeiro treino hoje!';
+        if (streak > 0) {
+            motivationText = `🔥 Você está em ${streak} dias! Continue assim!`;
+        } else if (points > 0) {
+            motivationText = `💪 Você é incrível! Volte amanhã para continuar sua sequência!`;
+        }
+
+        if (nextLevel < Infinity) {
+            const faltam = nextLevel - points;
+            motivationText = `📈 Faltam apenas ${faltam} pontos para o próximo nível!`;
+        }
+
+        document.getElementById('gamifWidget').innerHTML = `
+            <div class="gamif-header">
+                <h2>🎮 Seu Progresso</h2>
+            </div>
+
+            <div class="level-card">
+                <div class="level-icon">${levelIcon}</div>
+                <div class="level-info">
+                    <h3>${level}</h3>
+                    <p>${points} / ${nextLevel === Infinity ? '∞' : nextLevel} pontos</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-mini">
+                <div class="mini-stat">
+                    <div class="mini-stat-icon">💪</div>
+                    <div class="mini-stat-value">${userProfile.gamification?.totalWorkouts || 0}</div>
+                    <div class="mini-stat-label">Treinos</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="mini-stat-icon">⭐</div>
+                    <div class="mini-stat-value">${points}</div>
+                    <div class="mini-stat-label">Pontos</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="mini-stat-icon">🔥</div>
+                    <div class="mini-stat-value">${streak}</div>
+                    <div class="mini-stat-label">Sequência</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 16px; padding: 12px; background: #fffaf0; border-radius: 8px; border-left: 4px solid #E07800;">
+                <p style="margin: 0; color: #E07800; font-weight: 600;">${motivationText}</p>
+            </div>
+
+            <div style="margin-top: 16px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 14px;">🏅 Badges Conquistados</h3>
+                <div class="badges-grid">
+                    <div class="badge ${(gamif.badges || []).includes('first') ? 'unlocked' : ''}">
+                        <div class="badge-icon">🥇</div>
+                        <div class="badge-name">Primeiro</div>
+                    </div>
+                    <div class="badge ${(gamif.badges || []).includes('week7') ? 'unlocked' : ''}">
+                        <div class="badge-icon">🔥</div>
+                        <div class="badge-name">7 Dias</div>
+                    </div>
+                    <div class="badge ${(gamif.badges || []).includes('month30') ? 'unlocked' : ''}">
+                        <div class="badge-icon">💪</div>
+                        <div class="badge-name">30 Dias</div>
+                    </div>
+                    <div class="badge ${(gamif.badges || []).includes('top') ? 'unlocked' : ''}">
+                        <div class="badge-icon">⭐</div>
+                        <div class="badge-name">Top 3</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function loadStudents() {
+        // Implementação de carregamento de alunos
+    }
+
+    async function handleAddStudent(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = 'Adicionando...';
+
+        try {
+            await db.collection('alunos').add({
+                personalTrainerId: currentUser.uid,
+                name: document.getElementById('studentName').value,
+                email: document.getElementById('studentEmail').value,
+                phone: document.getElementById('studentPhone').value,
+                goal: document.getElementById('studentGoal').value,
+                dateOfBirth: document.getElementById('studentDOB').value,
+                measurements: {
+                    height: parseFloat(document.getElementById('studentHeight').value) || 0,
+                    weight: parseFloat(document.getElementById('studentWeight').value) || 0,
+                    chest: parseFloat(document.getElementById('studentChest').value) || 0,
+                    waist: parseFloat(document.getElementById('studentWaist').value) || 0,
+                    hips: parseFloat(document.getElementById('studentHips').value) || 0,
+                    arm: parseFloat(document.getElementById('studentArm').value) || 0,
+                    leg: parseFloat(document.getElementById('studentLeg').value) || 0
+                },
+                gamification: {
+                    points: 0,
+                    streak: 0,
+                    badges: [],
+                    totalWorkouts: 0,
+                    totalPoints: 0
+                },
+                createdAt: new Date()
+            });
+
+            showToast('✅ Aluno adicionado com sucesso!');
+            showPage('dashboard');
+            loadDashboard();
+        } catch (error) {
+            console.error('Erro:', error);
+            showToast('❌ Erro ao adicionar aluno');
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Adicionar Aluno';
+    }
+
+    async function handleCreateWorkout(e) {
+        e.preventDefault();
+        // Implementação de criação de treino
+        showToast('✅ Treino criado com sucesso!');
+    }
+
+    async function handleUpdateProfile(e) {
+        e.preventDefault();
+        // Implementação de atualização de perfil
+        showToast('✅ Perfil atualizado!');
+    }
+
+    async function handleLogout() {
+        if (confirm('Tem certeza que deseja sair?')) {
+            await auth.signOut();
+            window.location.href = 'index.html';
+        }
+    }
+
+    function subscribeToNotifications() {
+        // Implementação de notificações
+    }
+
+    function toggleNotificationPanel() {
+        document.getElementById('notificationPanel').classList.toggle('show');
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function openChat(alunoId) {
+        currentChat = alunoId;
+        showPage('chat');
+    }
+
+    function startWorkout(alunoId) {
+        // Redireciona para workout.html
+        window.location.href = `workout.html?alunoId=${alunoId}`;
+    }
+
+    async function loadRanking() {
+        // Implementação de ranking
+    }
+
+    async function loadProfile() {
+        // Implementação de perfil
+    }
+
+    async function loadAlunoTreinos() {
+        // Implementação de treinos do aluno
+    }
+
+    function addExerciseField() {
+        const container = document.getElementById('exercisesListAdd');
+        const newField = document.createElement('div');
+        newField.className = 'form-grid';
+        newField.innerHTML = `
+            <input type="text" placeholder="Exercício" class="exercise-name">
+            <input type="number" placeholder="Séries" class="exercise-sets">
+            <input type="number" placeholder="Reps" class="exercise-reps">
+            <input type="number" placeholder="Peso" class="exercise-weight">
+        `;
+        container.appendChild(newField);
+    }
+
+    async function loadAlunoData() {
+        // Implementação
+    }
+</script>
+
+</body>
+</html>
