@@ -1,81 +1,86 @@
-.photo-upload {
-  margin: 20px 0;
+.photo-upload-container {
+  margin: 12px 0;
 }
 
-.upload-area {
-  display: block;
-  cursor: pointer;
-  border: 2px dashed #E07800;
-  border-radius: 12px;
-  padding: 40px;
-  text-align: center;
-  transition: all 0.2s;
-  background: #fff9f5;
-}
-
-.upload-area:hover {
-  background: #ffe8d6;
-  border-color: #FF9900;
-}
-
-.upload-area input {
+.photo-input {
   display: none;
 }
 
-.upload-placeholder {
-  pointer-events: none;
+.upload-zone {
+  display: block;
+  padding: 24px;
+  border: 2px dashed #FFE0C0;
+  border-radius: 8px;
+  background: #fffaf0;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-zone:hover {
+  border-color: #E07800;
+  background: #fff5e6;
 }
 
 .upload-icon {
-  font-size: 48px;
-  display: block;
+  font-size: 40px;
   margin-bottom: 12px;
 }
 
-.upload-placeholder p {
-  margin: 0;
-  color: #666;
-  font-size: 16px;
+.upload-text {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
 }
 
-.preview {
-  max-width: 200px;
-  margin: 0 auto;
+.upload-zone small {
+  display: block;
+  color: #999;
+  font-size: 12px;
+  margin-top: 4px;
 }
 
-.preview img {
-  width: 100%;
+.preview-container {
+  position: relative;
   border-radius: 8px;
-  max-height: 200px;
-  object-fit: cover;
+  overflow: hidden;
+  background: #f5f5f5;
 }
 
-.upload-actions {
+.preview-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0,0,0,0.7);
   justify-content: center;
 }
 
-.btn-upload, .btn-cancel {
-  padding: 12px 24px;
+.btn-confirm,
+.btn-cancel {
+  padding: 8px 16px;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.btn-upload {
-  background: #E07800;
+.btn-confirm {
+  background: #00A87A;
   color: white;
 }
 
-.btn-upload:hover:not(:disabled) {
-  background: #FF9900;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(224, 120, 0, 0.3);
+.btn-confirm:hover:not(:disabled) {
+  background: #008860;
 }
 
 .btn-cancel {
@@ -83,15 +88,12 @@
   color: #333;
 }
 
-.btn-cancel:hover {
-  background: #e0e0e0;
+.btn-cancel:hover:not(:disabled) {
+  background: #ddd;
 }
 
-.error-message {
-  color: #d32f2f;
-  margin-top: 12px;
-  padding: 12px;
-  background: #ffebee;
-  border-radius: 8px;
-  font-size: 14px;
+.btn-confirm:disabled,
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
