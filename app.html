@@ -4,1079 +4,317 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#E07800">
-    <title>💪 FITNESS - Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f5f5;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        /* HEADER */
-        header {
-            background: white;
-            border-bottom: 2px solid #E07800;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 0 20px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #E07800;
-        }
-
-        .nav {
-            display: flex;
-            gap: 10px;
-            flex: 1;
-            margin-left: 40px;
-        }
-
-        .nav-btn {
-            padding: 8px 16px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            border-radius: 6px;
-            color: #666;
-            font-weight: 600;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .nav-btn.active {
-            background: #fffaf0;
-            color: #E07800;
-            border: 1px solid #FFE0C0;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-
-        .btn-logout {
-            padding: 10px 20px;
-            background: #d32f2f;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            font-size: 13px;
-        }
-
-        .btn-logout:hover {
-            background: #b71c1c;
-            transform: translateY(-2px);
-        }
-
-        /* MAIN */
-        main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        h1 {
-            font-size: 32px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #999;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        /* STATS GRID */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .stat-icon {
-            font-size: 40px;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #E07800;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-        }
-
-        /* SECTION */
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .section-header h2 {
-            font-size: 22px;
-            color: #333;
-            margin: 0;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(224,120,0,0.3);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #E07800;
-            color: white;
-        }
-
-        .btn-approve {
-            background: #4caf50;
-            color: white;
-            padding: 8px 16px;
-            font-size: 12px;
-        }
-
-        .btn-approve:hover {
-            background: #388e3c;
-        }
-
-        .btn-reject {
-            background: #f44336;
-            color: white;
-            padding: 8px 16px;
-            font-size: 12px;
-        }
-
-        .btn-reject:hover {
-            background: #d32f2f;
-        }
-
-        /* GRID LAYOUTS */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-        }
-
-        .card {
-            background: linear-gradient(135deg, #fff9f5 0%, #ffe8d6 100%);
-            border: 2px solid #FFE0C0;
-            border-radius: 12px;
-            padding: 16px;
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: #E07800;
-            box-shadow: 0 8px 24px rgba(224,120,0,0.15);
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .card-subtitle {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 12px;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .card-actions button {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-
-        /* PENDING CARD */
-        .pending-card {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffe8b6 100%);
-            border: 2px solid #ffc107;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-
-        .pending-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .pending-email {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 12px;
-        }
-
-        .pending-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* FORM */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #E07800;
-            box-shadow: 0 0 0 3px rgba(224,120,0,0.1);
-            background: #fffaf0;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        /* CHAT */
-        .chat-box {
-            background: white;
-            border-radius: 12px;
-            height: 500px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-
-        .chat-header {
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-            padding: 16px;
-            border-radius: 12px 12px 0 0;
-            font-weight: 600;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            display: flex;
-            animation: slideIn 0.3s;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message.own {
-            justify-content: flex-end;
-        }
-
-        .msg-content {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            word-break: break-word;
-            font-size: 14px;
-        }
-
-        .message.own .msg-content {
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            color: white;
-        }
-
-        .message.other .msg-content {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .chat-input {
-            display: flex;
-            gap: 8px;
-            padding: 16px;
-            border-top: 1px solid #eee;
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        .chat-input button {
-            padding: 12px 20px;
-            background: #E07800;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* RANKING */
-        .ranking-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .ranking-header {
-            display: grid;
-            grid-template-columns: 80px 1fr 120px 120px 120px;
-            gap: 16px;
-            padding: 16px;
-            background: #f8f8f8;
-            border-radius: 8px;
-            font-weight: 600;
-            color: #666;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
-        .ranking-row {
-            display: grid;
-            grid-template-columns: 80px 1fr 120px 120px 120px;
-            gap: 16px;
-            padding: 16px;
-            border-bottom: 1px solid #eee;
-            align-items: center;
-        }
-
-        .ranking-row:hover {
-            background: #f8f8f8;
-        }
-
-        .rank-position {
-            background: #E07800;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            margin: 0 auto;
-        }
-
-        /* GAMIFICATION */
-        .gamif-widget {
-            background: linear-gradient(135deg, #fff9f5 0%, #ffe8d6 100%);
-            border: 2px solid #FFE0C0;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 30px;
-        }
-
-        .level-display {
-            font-size: 18px;
-            font-weight: 700;
-            color: #E07800;
-            margin-bottom: 12px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #eee;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #E07800 0%, #FF9900 100%);
-            transition: width 0.3s;
-        }
-
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .badge {
-            text-align: center;
-            padding: 12px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            opacity: 0.4;
-            transition: all 0.2s;
-        }
-
-        .badge.unlocked {
-            background: linear-gradient(135deg, #fffaf0 0%, #fff5e6 100%);
-            border-color: #FFD700;
-            opacity: 1;
-            box-shadow: 0 4px 12px rgba(255,215,0,0.2);
-        }
-
-        .badge-icon {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .badge-name {
-            font-size: 10px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        /* PROFILE */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            margin-bottom: 30px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-            flex-shrink: 0;
-        }
-
-        .profile-info h3 {
-            margin: 0 0 6px 0;
-            font-size: 22px;
-            color: #333;
-        }
-
-        .profile-info p {
-            margin: 0;
-            color: #999;
-            font-size: 14px;
-        }
-
-        /* TOAST */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #333;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            z-index: 2000;
-            animation: slideInRight 0.3s;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 1024px) {
-            .nav {
-                display: none;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .chat-box {
-                height: 400px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            header {
-                height: 60px;
-                padding: 0 12px;
-            }
-
-            .logo {
-                font-size: 18px;
-            }
-
-            .nav {
-                display: none;
-            }
-
-            .user-name {
-                display: none;
-            }
-
-            .btn-logout {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-
-            main {
-                padding: 20px 12px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .ranking-header,
-            .ranking-row {
-                grid-template-columns: 1fr;
-            }
-
-            .profile-header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 20px;
-            }
-
-            .stat-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .card-actions {
-                flex-direction: column;
-            }
-
-            .pending-actions {
-                flex-direction: column;
-            }
-
-            .chat-box {
-                height: 300px;
-            }
-
-            .msg-content {
-                max-width: 100%;
-            }
-        }
-    </style>
+    <title>💪 FITNESS - App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js"></script>
 </head>
-<body>
+<body class="bg-gray-50">
 
-<div class="container">
-    <header>
-        <div class="logo">💪 FITNESS</div>
-        <nav class="nav" id="navbar"></nav>
-        <div class="header-right">
-            <div class="user-name" id="userName"></div>
-            <button class="btn-logout" onclick="handleLogout()">Sair</button>
-        </div>
-    </header>
-
-    <main>
-        <!-- DASHBOARD PAGE -->
-        <div id="dashboardPage" class="page active">
-            <h1 id="dashboardTitle">Bem-vindo!</h1>
-            <p class="subtitle" id="dashboardSubtitle">Seu espaço de controle</p>
-            <div class="stats-grid" id="statsGrid"></div>
-
-            <!-- PT: PENDING ALUNOS -->
-            <div class="section" id="pendingSection" style="display: none;">
-                <div class="section-header">
-                    <h2>⏳ Alunos Pendentes de Aprovação</h2>
-                </div>
-                <div id="pendingList"></div>
-            </div>
-
-            <!-- PT: ALUNOS APROVADOS -->
-            <div class="section" id="studentsSection" style="display: none;">
-                <div class="section-header">
-                    <h2>Meus Alunos</h2>
-                    <button class="btn btn-primary" onclick="goToPage('addStudent')">➕ Novo Aluno</button>
-                </div>
-                <div class="grid" id="studentsGrid"></div>
-            </div>
-
-            <!-- ALUNO: GAMIFICAÇÃO -->
-            <div id="gamificationSection" style="display: none;">
-                <div class="gamif-widget">
-                    <div class="section-header">
-                        <h2>🎮 Seu Progresso</h2>
-                    </div>
-                    <div id="gamificationContent"></div>
-                </div>
-            </div>
-
-            <!-- ALUNO: SEUS TREINOS -->
-            <div class="section" id="alunoTreinosSection" style="display: none;">
-                <div class="section-header">
-                    <h2>Seus Treinos</h2>
-                </div>
-                <div class="grid" id="alunoTreinosGrid"></div>
-            </div>
-        </div>
-
-        <!-- ADD STUDENT PAGE -->
-        <div id="addStudentPage" class="page">
-            <h1>Adicionar Novo Aluno</h1>
-            <p class="subtitle">Preencha os dados abaixo</p>
-
-            <div class="section">
-                <form onsubmit="handleAddStudent(event)">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Nome</label>
-                            <input type="text" id="studentName" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="studentEmail" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Telefone</label>
-                            <input type="tel" id="studentPhone">
-                        </div>
-                        <div class="form-group">
-                            <label>Data de Nascimento</label>
-                            <input type="date" id="studentDOB">
-                        </div>
-                        <div class="form-group">
-                            <label>Gênero</label>
-                            <select id="studentGender">
-                                <option value="">Selecionar...</option>
-                                <option value="M">Masculino</option>
-                                <option value="F">Feminino</option>
-                                <option value="O">Outro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Objetivo</label>
-                            <input type="text" id="studentGoal" placeholder="Ex: Ganhar massa, Perder peso">
-                        </div>
-                        <div class="form-group">
-                            <label>Altura (cm)</label>
-                            <input type="number" id="studentHeight" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label>Peso (kg)</label>
-                            <input type="number" id="studentWeight" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label>Peito (cm)</label>
-                            <input type="number" id="studentChest" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label>Cintura (cm)</label>
-                            <input type="number" id="studentWaist" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label>Quadril (cm)</label>
-                            <input type="number" id="studentHips" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label>Braço (cm)</label>
-                            <input type="number" id="studentArm" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label>Perna (cm)</label>
-                            <input type="number" id="studentLeg" step="0.1">
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Adicionar Aluno</button>
-                        <button type="button" class="btn btn-secondary" onclick="goToPage('dashboard')">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- CREATE WORKOUT PAGE -->
-        <div id="createWorkoutPage" class="page">
-            <h1>Criar Novo Treino</h1>
-            <p class="subtitle">Prescreva um treino para seu aluno</p>
-
-            <div class="section">
-                <form onsubmit="handleCreateWorkout(event)">
-                    <div class="form-grid">
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Selecione o Aluno</label>
-                            <select id="workoutAlunoSelect" required onchange="loadAlunoForWorkout()">
-                                <option value="">Escolha um aluno...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Nome do Treino</label>
-                            <input type="text" id="workoutName" placeholder="Ex: Peito e Tríceps" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Dificuldade</label>
-                            <select id="workoutDifficulty">
-                                <option value="facil">Fácil</option>
-                                <option value="moderado" selected>Moderado</option>
-                                <option value="dificil">Difícil</option>
-                                <option value="avancado">Avançado</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Descrição</label>
-                            <textarea id="workoutDesc" rows="3" placeholder="Instruções e observações"></textarea>
-                        </div>
-                    </div>
-
-                    <div style="background: #f8f8f8; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="margin-bottom: 16px;">Exercícios do Treino</h3>
-                        <div id="exercisesContainer"></div>
-                        <button type="button" class="btn btn-secondary" onclick="addExerciseField()" style="width: 100%; margin-top: 12px;">➕ Adicionar Exercício</button>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Criar Treino</button>
-                        <button type="button" class="btn btn-secondary" onclick="goToPage('dashboard')">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- CHAT PAGE -->
-        <div id="chatPage" class="page">
-            <h1>Chat</h1>
-            <p class="subtitle">Converse com seu personal ou alunos</p>
-
-            <div class="section">
-                <div class="chat-box">
-                    <div class="chat-header" id="chatHeader">Selecione um contato</div>
-                    <div class="chat-messages" id="chatMessages"></div>
-                    <div class="chat-input" id="chatInputDiv" style="display: none;">
-                        <input type="text" id="chatInput" placeholder="Digite uma mensagem..." maxlength="500">
-                        <button onclick="sendMessage()">Enviar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- RANKING PAGE -->
-        <div id="rankingPage" class="page">
-            <h1>🏆 Ranking</h1>
-            <p class="subtitle">Posições na comunidade</p>
-
-            <div class="section">
-                <div class="ranking-header">
-                    <div>Posição</div>
-                    <div>Aluno</div>
-                    <div>Treinos</div>
-                    <div>Pontos</div>
-                    <div>Sequência</div>
-                </div>
-                <div id="rankingList"></div>
-            </div>
-        </div>
-
-        <!-- PROFILE PAGE -->
-        <div id="profilePage" class="page">
-            <h1>Meu Perfil</h1>
-            <p class="subtitle">Gerenciar suas informações</p>
-
-            <div class="section">
-                <div class="profile-header">
-                    <div class="profile-avatar" id="profileAvatar">👤</div>
-                    <div class="profile-info">
-                        <h3 id="profileName">Carregando...</h3>
-                        <p id="profileRole">Aluno</p>
-                        <p id="profileEmail">email@example.com</p>
-                    </div>
-                </div>
-
-                <form onsubmit="handleUpdateProfile(event)">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Nome</label>
-                            <input type="text" id="profileNameInput" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="profileEmailInput" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Telefone</label>
-                            <input type="tel" id="profilePhoneInput">
-                        </div>
-                        <div class="form-group" id="profileBioDiv" style="display: none;">
-                            <label>Bio / Especialidade</label>
-                            <textarea id="profileBioInput" rows="3"></textarea>
-                        </div>
-                        <div class="form-group" id="profileGoalDiv" style="display: none;">
-                            <label>Objetivo</label>
-                            <input type="text" id="profileGoalInput">
-                        </div>
-                        <div class="form-group" id="profileDOBDiv" style="display: none;">
-                            <label>Data de Nascimento</label>
-                            <input type="date" id="profileDOBInput">
-                        </div>
-                        <div class="form-group" id="profileHeightDiv" style="display: none;">
-                            <label>Altura (cm)</label>
-                            <input type="number" id="profileHeightInput" step="0.1">
-                        </div>
-                        <div class="form-group" id="profileWeightDiv" style="display: none;">
-                            <label>Peso (kg)</label>
-                            <input type="number" id="profileWeightInput" step="0.1">
-                        </div>
-                        <div class="form-group" id="profileChestDiv" style="display: none;">
-                            <label>Peito (cm)</label>
-                            <input type="number" id="profileChestInput" step="0.1">
-                        </div>
-                        <div class="form-group" id="profileWaistDiv" style="display: none;">
-                            <label>Cintura (cm)</label>
-                            <input type="number" id="profileWaistInput" step="0.1">
-                        </div>
-                        <div class="form-group" id="profileHipsDiv" style="display: none;">
-                            <label>Quadril (cm)</label>
-                            <input type="number" id="profileHipsInput" step="0.1">
-                        </div>
-                        <div class="form-group" id="profileArmDiv" style="display: none;">
-                            <label>Braço (cm)</label>
-                            <input type="number" id="profileArmInput" step="0.1">
-                        </div>
-                        <div class="form-group" id="profileLegDiv" style="display: none;">
-                            <label>Perna (cm)</label>
-                            <input type="number" id="profileLegInput" step="0.1">
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                        <button type="button" class="btn btn-secondary" onclick="goToPage('dashboard')">Voltar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- DIET PAGE -->
-        <div id="dietPage" class="page">
-            <h1>Prescrever Dieta</h1>
-            <p class="subtitle">Crie um plano alimentar para seu aluno</p>
-
-            <div class="section">
-                <form onsubmit="handleCreateDiet(event)">
-                    <div class="form-grid">
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Selecione o Aluno</label>
-                            <select id="dietAlunoSelect" required>
-                                <option value="">Escolha um aluno...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Objetivo</label>
-                            <select id="dietGoal" required>
-                                <option value="">Selecionar...</option>
-                                <option value="ganhar">Ganhar Massa</option>
-                                <option value="perder">Perder Peso</option>
-                                <option value="manter">Manter</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Observações</label>
-                            <textarea id="dietNotes" rows="3" placeholder="Restrições, alergias, preferências..."></textarea>
-                        </div>
-                    </div>
-
-                    <div style="background: #f8f8f8; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="margin-bottom: 16px;">Refeições</h3>
-                        <div id="mealsContainer"></div>
-                        <button type="button" class="btn btn-secondary" onclick="addMealField()" style="width: 100%; margin-top: 12px;">➕ Adicionar Refeição</button>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Salvar Dieta</button>
-                        <button type="button" class="btn btn-secondary" onclick="goToPage('dashboard')">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </main>
+<!-- LOADING SCREEN -->
+<div id="loading" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+    <div class="text-center">
+        <div class="text-6xl mb-4 animate-spin">⚙️</div>
+        <p class="text-gray-600 text-lg">Carregando aplicação...</p>
+    </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+<!-- NAV BAR -->
+<nav class="bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-3xl">💪</span>
+            <span class="text-xl font-black">FITNESS</span>
+        </div>
+        <div id="userName" class="text-sm font-semibold"></div>
+        <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-bold transition">
+            Sair
+        </button>
+    </div>
+</nav>
+
+<!-- MAIN CONTAINER -->
+<div class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- PT DASHBOARD -->
+    <div id="ptDashboard" class="hidden">
+        <h1 class="text-4xl font-black text-gray-900 mb-2" id="welcomeTitle">Bem-vindo!</h1>
+        <p class="text-gray-600 mb-8">Gerencie seus alunos e acompanhe o progresso deles</p>
+
+        <!-- STATS GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-orange-600">
+                <div class="text-3xl font-black text-orange-600" id="statAlunos">0</div>
+                <div class="text-gray-600 font-semibold">Alunos Ativos</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+                <div class="text-3xl font-black text-yellow-500" id="statPending">0</div>
+                <div class="text-gray-600 font-semibold">Pendentes</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-600">
+                <div class="text-3xl font-black text-green-600" id="statTreinos">0</div>
+                <div class="text-gray-600 font-semibold">Treinos Totais</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-600">
+                <div class="text-3xl font-black text-blue-600" id="statPontos">0</div>
+                <div class="text-gray-600 font-semibold">Pontos Alunos</div>
+            </div>
+        </div>
+
+        <!-- PENDING ALUNOS -->
+        <div id="pendingSection" class="bg-white rounded-lg shadow p-6 mb-8 hidden">
+            <h2 class="text-2xl font-black text-gray-900 mb-4">⏳ Alunos Pendentes</h2>
+            <div id="pendingList" class="space-y-4"></div>
+        </div>
+
+        <!-- ACTIVE ALUNOS -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-gray-900">Meus Alunos</h2>
+                <button onclick="goToAddAluno()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-bold transition">
+                    ➕ Novo Aluno
+                </button>
+            </div>
+            <div id="alumnosList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+    </div>
+
+    <!-- ALUNO DASHBOARD -->
+    <div id="alunoDashboard" class="hidden">
+        <h1 class="text-4xl font-black text-gray-900 mb-2" id="alunoWelcome">Bem-vindo!</h1>
+        <p class="text-gray-600 mb-8">Seu espaço de treinos e evolução</p>
+
+        <!-- STATS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-orange-600">
+                <div class="text-3xl font-black text-orange-600" id="alunoTreinos">0</div>
+                <div class="text-gray-600 font-semibold">Treinos Completos</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-600">
+                <div class="text-3xl font-black text-blue-600" id="alunoPontos">0</div>
+                <div class="text-gray-600 font-semibold">Pontos Totais</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-600">
+                <div class="text-3xl font-black text-red-600" id="alunoStreak">0</div>
+                <div class="text-gray-600 font-semibold">Dias de Fogo 🔥</div>
+            </div>
+        </div>
+
+        <!-- MEUS TREINOS -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-black text-gray-900 mb-4">Meus Treinos</h2>
+            <div id="alunoTreinosList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="profilePage" class="hidden bg-white rounded-lg shadow p-6">
+        <h1 class="text-4xl font-black text-gray-900 mb-8">Meu Perfil</h1>
+        
+        <form id="profileForm" onsubmit="handleProfileSave(event)">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Photo -->
+                <div class="flex flex-col items-center">
+                    <div id="profilePhotoPreview" class="w-48 h-48 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center text-6xl mb-4 shadow-lg">
+                        👤
+                    </div>
+                    <label class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-bold cursor-pointer transition">
+                        Alterar Foto
+                        <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto()" class="hidden">
+                    </label>
+                </div>
+
+                <!-- Personal Info -->
+                <div class="md:col-span-2 space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">Nome Completo</label>
+                        <input type="text" id="profileName" required
+                            class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">Email</label>
+                        <input type="email" id="profileEmail" disabled
+                            class="w-full px-4 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">Telefone</label>
+                        <input type="tel" id="profilePhone"
+                            class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                    </div>
+
+                    <!-- ALUNO FIELDS -->
+                    <div id="alunoFields" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2">Objetivo</label>
+                            <input type="text" id="profileGoal" placeholder="Ex: Ganhar massa"
+                                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2">Data de Nascimento</label>
+                            <input type="date" id="profileDOB"
+                                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                        </div>
+
+                        <h3 class="text-lg font-bold text-gray-900 mt-6">Medidas Corporais</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-bold text-sm mb-2">Altura (cm)</label>
+                                <input type="number" id="profileHeight" step="0.1"
+                                    class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-bold text-sm mb-2">Peso (kg)</label>
+                                <input type="number" id="profileWeight" step="0.1"
+                                    class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-bold text-sm mb-2">Peito (cm)</label>
+                                <input type="number" id="profileChest" step="0.1"
+                                    class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-bold text-sm mb-2">Cintura (cm)</label>
+                                <input type="number" id="profileWaist" step="0.1"
+                                    class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-bold text-sm mb-2">Quadril (cm)</label>
+                                <input type="number" id="profileHips" step="0.1"
+                                    class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-bold text-sm mb-2">Braço (cm)</label>
+                                <input type="number" id="profileArm" step="0.1"
+                                    class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PT FIELDS -->
+                    <div id="ptFields" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2">Bio / Especialidade</label>
+                            <textarea id="profileBio" rows="4"
+                                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex gap-4">
+                <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-bold transition">
+                    💾 Salvar
+                </button>
+                <button type="button" onclick="goToDashboard()" class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-bold transition">
+                    Voltar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ADD ALUNO PAGE -->
+    <div id="addAlunoPage" class="hidden bg-white rounded-lg shadow p-6">
+        <h1 class="text-4xl font-black text-gray-900 mb-8">Adicionar Novo Aluno</h1>
+        
+        <form id="addAlunoForm" onsubmit="handleAddAluno(event)">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Nome Completo *</label>
+                    <input type="text" id="alunoName" required
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Email *</label>
+                    <input type="email" id="alunoEmail" required
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Telefone</label>
+                    <input type="tel" id="alunoPhone"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Objetivo</label>
+                    <input type="text" id="alunoGoal" placeholder="Ganhar massa, Perder peso..."
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Data de Nascimento</label>
+                    <input type="date" id="alunoDOB"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Gênero</label>
+                    <select id="alunoGender"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                        <option value="">Selecionar...</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                        <option value="O">Outro</option>
+                    </select>
+                </div>
+
+                <h3 class="col-span-full text-lg font-bold text-gray-900">Medidas Iniciais</h3>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Altura (cm)</label>
+                    <input type="number" id="alunoHeight" step="0.1"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Peso (kg)</label>
+                    <input type="number" id="alunoWeight" step="0.1"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Peito (cm)</label>
+                    <input type="number" id="alunoChest" step="0.1"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Cintura (cm)</label>
+                    <input type="number" id="alunoWaist" step="0.1"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Quadril (cm)</label>
+                    <input type="number" id="alunoHips" step="0.1"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Braço (cm)</label>
+                    <input type="number" id="alunoArm" step="0.1"
+                        class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                </div>
+            </div>
+
+            <div class="mt-8 flex gap-4">
+                <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-bold transition">
+                    ✅ Adicionar Aluno
+                </button>
+                <button type="button" onclick="goToDashboard()" class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-bold transition">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
 
 <script>
     const firebaseConfig = {
@@ -1091,14 +329,18 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     let currentUser = null;
-    let userRole = null;
-    let userProfile = null;
-    let alunosList = [];
+    let userType = null;
+    let userData = null;
+    let selectedPhotoFile = null;
 
+    // Check auth
     auth.onAuthStateChanged(async user => {
+        console.log('✅ Auth state:', user ? user.email : 'No user');
         if (!user) {
+            console.log('❌ No user, redirecting to login');
             window.location.href = 'index.html';
             return;
         }
@@ -1108,326 +350,289 @@
 
     async function initApp() {
         try {
-            // Detectar se é PT ou Aluno
-            const ptDoc = await db.collection('users').doc(currentUser.uid).get();
-            if (ptDoc.exists) {
-                userRole = 'pt';
-                userProfile = ptDoc.data();
-            } else {
-                const alunosSnap = await db.collection('alunos').where('uid', '==', currentUser.uid).get();
-                if (!alunosSnap.empty) {
-                    userRole = 'aluno';
-                    userProfile = { id: alunosSnap.docs[0].id, ...alunosSnap.docs[0].data() };
-                } else {
-                    showToast('❌ Erro: Perfil não encontrado');
-                    setTimeout(() => auth.signOut(), 2000);
-                    return;
-                }
+            console.log('🚀 Initializing app for:', currentUser.email);
+            
+            // Get user data
+            const doc = await db.collection('users').doc(currentUser.uid).get();
+            if (!doc.exists) {
+                console.error('❌ User document not found');
+                showToast('❌ Erro ao carregar perfil');
+                return;
             }
 
+            userData = doc.data();
+            userType = userData.type;
+            console.log('✅ User data loaded:', userType);
+
+            // Setup UI
+            document.getElementById('userName').textContent = userData.name;
             setupUI();
-            loadDashboard();
+            
+            // Hide loading
+            document.getElementById('loading').classList.add('hidden');
+            
+            // Load dashboard
+            await loadDashboard();
 
         } catch (error) {
-            console.error('Erro:', error);
+            console.error('❌ Init error:', error);
             showToast('❌ Erro ao carregar aplicação');
         }
     }
 
     function setupUI() {
-        document.getElementById('userName').textContent = userProfile.name;
-
-        if (userRole === 'pt') {
-            document.getElementById('navbar').innerHTML = `
-                <button class="nav-btn active" onclick="goToPage('dashboard')">Dashboard</button>
-                <button class="nav-btn" onclick="goToPage('createWorkout')">Treinos</button>
-                <button class="nav-btn" onclick="goToPage('diet')">Dietas</button>
-                <button class="nav-btn" onclick="goToPage('chat')">Chat</button>
-                <button class="nav-btn" onclick="goToPage('ranking')">Ranking</button>
-            `;
-            document.getElementById('pendingSection').style.display = 'block';
-            document.getElementById('studentsSection').style.display = 'block';
-        } else {
-            document.getElementById('navbar').innerHTML = `
-                <button class="nav-btn active" onclick="goToPage('dashboard')">Home</button>
-                <button class="nav-btn" onclick="goToPage('chat')">Chat</button>
-                <button class="nav-btn" onclick="goToPage('ranking')">Ranking</button>
-            `;
-            document.getElementById('gamificationSection').style.display = 'block';
-            document.getElementById('alunoTreinosSection').style.display = 'block';
-        }
-
-        document.getElementById('profileAvatar').textContent = userProfile.name?.charAt(0).toUpperCase() || 'U';
-        document.getElementById('profileName').textContent = userProfile.name;
-        document.getElementById('profileEmail').textContent = userProfile.email;
-        document.getElementById('profileRole').textContent = userRole === 'pt' ? 'Personal Trainer' : 'Aluno';
+        document.getElementById('ptDashboard').classList.toggle('hidden', userType !== 'pt');
+        document.getElementById('alunoDashboard').classList.toggle('hidden', userType !== 'aluno');
+        document.getElementById('alunoFields').classList.toggle('hidden', userType !== 'aluno');
+        document.getElementById('ptFields').classList.toggle('hidden', userType !== 'pt');
     }
 
     async function loadDashboard() {
-        const hora = new Date().getHours();
-        const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
 
-        document.getElementById('dashboardTitle').textContent = `${saudacao}, ${userProfile.name}!`;
-
-        if (userRole === 'pt') {
+        if (userType === 'pt') {
+            console.log('📊 Loading PT dashboard...');
+            document.getElementById('welcomeTitle').textContent = `${greeting}, ${userData.name}!`;
             await loadPTDashboard();
         } else {
+            console.log('📊 Loading Aluno dashboard...');
+            document.getElementById('alunoWelcome').textContent = `${greeting}, ${userData.name}!`;
             await loadAlunoDashboard();
         }
+
+        loadProfileForm();
     }
 
     async function loadPTDashboard() {
         try {
-            const alunosSnap = await db.collection('alunos').where('personalTrainerId', '==', currentUser.uid).get();
-            alunosList = alunosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            // Get alunos
+            const alunosSnap = await db.collection('users')
+                .where('type', '==', 'aluno')
+                .where('personalTrainerId', '==', currentUser.uid)
+                .get();
 
-            const pendingSnap = await db.collection('alunos').where('status', '==', 'pending').get();
-            const pendingList = pendingSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const alunos = alunosSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+            console.log('✅ Alunos loaded:', alunos.length);
 
-            const totalWorkouts = await Promise.all(
-                alunosList.map(aluno =>
-                    db.collection('workouts_completed').where('alunoId', '==', aluno.id).get()
-                        .then(snap => snap.size)
-                )
-            );
+            // Get pending
+            const pendingSnap = await db.collection('users')
+                .where('type', '==', 'aluno')
+                .where('status', '==', 'pending')
+                .get();
 
-            const totalPoints = alunosList.reduce((sum, a) => sum + (a.gamification?.totalPoints || 0), 0);
+            const pending = pendingSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+            console.log('✅ Pending alunos:', pending.length);
 
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div>
-                        <div class="stat-value">${alunosList.length}</div>
-                        <div class="stat-label">Alunos Ativos</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⏳</div>
-                    <div>
-                        <div class="stat-value">${pendingList.length}</div>
-                        <div class="stat-label">Pendentes</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💪</div>
-                    <div>
-                        <div class="stat-value">${totalWorkouts.reduce((a,b) => a+b, 0)}</div>
-                        <div class="stat-label">Treinos Completos</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⭐</div>
-                    <div>
-                        <div class="stat-value">${totalPoints}</div>
-                        <div class="stat-label">Pontos Totais</div>
-                    </div>
-                </div>
-            `;
+            // Update stats
+            document.getElementById('statAlunos').textContent = alunos.length;
+            document.getElementById('statPending').textContent = pending.length;
+            document.getElementById('statTreinos').textContent = alunos.reduce((sum, a) => sum + (a.gamification?.totalWorkouts || 0), 0);
+            document.getElementById('statPontos').textContent = alunos.reduce((sum, a) => sum + (a.gamification?.totalPoints || 0), 0);
 
-            // Alunos pendentes
-            if (pendingList.length > 0) {
-                document.getElementById('pendingList').innerHTML = pendingList.map(aluno => `
-                    <div class="pending-card">
-                        <div class="pending-name">${aluno.name}</div>
-                        <div class="pending-email">${aluno.email}</div>
-                        <div class="pending-actions">
-                            <button class="btn-approve" onclick="approveAluno('${aluno.id}')">✅ Aprovar</button>
-                            <button class="btn-reject" onclick="rejectAluno('${aluno.id}')">❌ Rejeitar</button>
+            // Render pending
+            if (pending.length > 0) {
+                document.getElementById('pendingSection').classList.remove('hidden');
+                document.getElementById('pendingList').innerHTML = pending.map(aluno => `
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-gray-900">${aluno.name}</div>
+                            <div class="text-sm text-gray-600">${aluno.email}</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="approveAluno('${aluno.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-bold">
+                                ✅ Aprovar
+                            </button>
+                            <button onclick="rejectAluno('${aluno.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold">
+                                ❌ Rejeitar
+                            </button>
                         </div>
                     </div>
                 `).join('');
-            } else {
-                document.getElementById('pendingList').innerHTML = '<div class="empty-state">Nenhum aluno pendente</div>';
             }
 
-            // Alunos aprovados
-            const approvedList = alunosList.filter(a => a.status === 'approved' || !a.status);
-            if (approvedList.length > 0) {
-                document.getElementById('studentsGrid').innerHTML = approvedList.map(aluno => `
-                    <div class="card">
-                        <div class="card-title">${aluno.name}</div>
-                        <div class="card-subtitle">${aluno.goal || 'Sem objetivo'}</div>
-                        <div style="font-size: 12px; color: #999; margin-bottom: 12px;">
+            // Render alunos
+            document.getElementById('alumnosList').innerHTML = alunos.length === 0 
+                ? '<div class="col-span-full text-center py-8 text-gray-500">Nenhum aluno aprovado ainda</div>'
+                : alunos.map(aluno => `
+                    <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-orange-500 transition">
+                        <div class="font-bold text-gray-900 mb-2">${aluno.name}</div>
+                        <div class="text-sm text-gray-600 mb-4">${aluno.goal || 'Sem objetivo'}</div>
+                        <div class="text-xs text-gray-500 mb-4">
                             💪 ${aluno.gamification?.totalWorkouts || 0} treinos | ⭐ ${aluno.gamification?.totalPoints || 0} pts
                         </div>
-                        <div class="card-actions">
-                            <button class="btn-primary" onclick="startWorkout('${aluno.id}')">➕ Treino</button>
-                            <button class="btn-secondary" onclick="editAluno('${aluno.id}')">✏️ Editar</button>
+                        <div class="flex gap-2">
+                            <button onclick="editAluno('${aluno.id}')" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded text-sm font-bold transition">
+                                ✏️ Editar
+                            </button>
+                            <button onclick="deleteAluno('${aluno.id}')" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-bold transition">
+                                🗑️ Deletar
+                            </button>
                         </div>
                     </div>
                 `).join('');
-            } else {
-                document.getElementById('studentsGrid').innerHTML = '<div class="empty-state">Nenhum aluno aprovado ainda</div>';
-            }
-
-            // Popular selects
-            populateAlunoSelects();
 
         } catch (error) {
-            console.error('Erro ao carregar PT dashboard:', error);
+            console.error('❌ Error loading PT dashboard:', error);
             showToast('❌ Erro ao carregar dados');
         }
     }
 
     async function loadAlunoDashboard() {
         try {
-            const workoutsSnap = await db.collection('workouts_completed').where('alunoId', '==', userProfile.id).get();
-            const totalWorkouts = workoutsSnap.size;
+            console.log('📊 Loading aluno stats...');
+            
+            const workouts = userData.gamification?.totalWorkouts || 0;
+            const points = userData.gamification?.totalPoints || 0;
+            const streak = userData.gamification?.streak || 0;
 
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-icon">💪</div>
-                    <div>
-                        <div class="stat-value">${totalWorkouts}</div>
-                        <div class="stat-label">Treinos</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⭐</div>
-                    <div>
-                        <div class="stat-value">${userProfile.gamification?.totalPoints || 0}</div>
-                        <div class="stat-label">Pontos</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🔥</div>
-                    <div>
-                        <div class="stat-value">${userProfile.gamification?.streak || 0}</div>
-                        <div class="stat-label">Sequência</div>
-                    </div>
-                </div>
-            `;
+            document.getElementById('alunoTreinos').textContent = workouts;
+            document.getElementById('alunoPontos').textContent = points;
+            document.getElementById('alunoStreak').textContent = streak;
 
-            // Gamificação
-            const points = userProfile.gamification?.totalPoints || 0;
-            let level = 'Novato';
-            let levelIcon = '⚪';
-            if (points >= 500) { level = 'Guerreiro'; levelIcon = '🟠'; }
-            if (points >= 1500) { level = 'Lendário'; levelIcon = '🟡'; }
-            if (points >= 3000) { level = 'Supremo'; levelIcon = '🔴'; }
+            // Load treinos
+            const treinosSnap = await db.collection('treinos')
+                .where('personalTrainerId', '==', userData.personalTrainerId || '')
+                .get();
 
-            const nextLevel = points < 500 ? 500 : points < 1500 ? 1500 : points < 3000 ? 3000 : Infinity;
-            const prevLevel = points < 500 ? 0 : points < 1500 ? 500 : points < 3000 ? 1500 : 3000;
-            const progress = Math.min(((points - prevLevel) / (nextLevel - prevLevel)) * 100, 100);
+            const treinos = treinosSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+            console.log('✅ Treinos loaded:', treinos.length);
 
-            document.getElementById('gamificationContent').innerHTML = `
-                <div class="level-display">${levelIcon} ${level} - ${points} / ${nextLevel === Infinity ? '∞' : nextLevel} pontos</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progress}%"></div>
-                </div>
-                <div style="font-size: 14px; color: #666; margin-top: 12px; margin-bottom: 16px;">
-                    ${nextLevel < Infinity ? `Faltam ${nextLevel - points} pontos para o próximo nível!` : 'Você é SUPREMO! 🔥'}
-                </div>
-                <div style="background: #fffaf0; padding: 12px; border-radius: 8px; font-size: 13px; color: #E07800;">
-                    ${userProfile.gamification?.streak > 0 
-                        ? `🔥 Você está em ${userProfile.gamification.streak} dias! Continue!` 
-                        : '💪 Comece seu treino para iniciar sua sequência!'}
-                </div>
-            `;
-
-            // Badges
-            const badges = [
-                { id: 'first', name: 'Primeiro', icon: '🥇', unlocked: (userProfile.gamification?.badges || []).includes('first') },
-                { id: 'week7', name: '7 Dias', icon: '🔥', unlocked: (userProfile.gamification?.badges || []).includes('week7') },
-                { id: 'month30', name: '30 Dias', icon: '💪', unlocked: (userProfile.gamification?.badges || []).includes('month30') },
-                { id: 'top', name: 'Top 3', icon: '⭐', unlocked: (userProfile.gamification?.badges || []).includes('top') }
-            ];
-
-            const badgesHTML = badges.map(b => `
-                <div class="badge ${b.unlocked ? 'unlocked' : ''}">
-                    <div class="badge-icon">${b.icon}</div>
-                    <div class="badge-name">${b.name}</div>
-                </div>
-            `).join('');
-
-            document.getElementById('gamificationContent').innerHTML += `<div class="badges-grid">${badgesHTML}</div>`;
-
-            // Treinos do aluno
-            const treinosSnap = await db.collection('treinos').where('alunoId', '==', userProfile.id).get();
-            const treinos = treinosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            if (treinos.length > 0) {
-                document.getElementById('alunoTreinosGrid').innerHTML = treinos.map(treino => `
-                    <div class="card">
-                        <div class="card-title">${treino.name}</div>
-                        <div class="card-subtitle">${treino.difficulty || 'Moderado'}</div>
-                        <div style="font-size: 12px; color: #999; margin-bottom: 12px;">
-                            ${(treino.exercises || []).length} exercícios
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-primary" onclick="startExecuteWorkout('${treino.id}')">▶️ Executar</button>
-                        </div>
+            document.getElementById('alunoTreinosList').innerHTML = treinos.length === 0
+                ? '<div class="col-span-full text-center py-8 text-gray-500">Seu personal ainda não prescreveu treinos</div>'
+                : treinos.map(treino => `
+                    <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-orange-500 transition">
+                        <div class="font-bold text-gray-900 mb-2">${treino.name}</div>
+                        <div class="text-sm text-gray-600 mb-2">${treino.difficulty || 'Moderado'}</div>
+                        <div class="text-xs text-gray-500 mb-4">💪 ${(treino.exercises || []).length} exercícios</div>
+                        <button onclick="startWorkout('${treino.id}')" class="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded font-bold transition">
+                            ▶️ Começar Treino
+                        </button>
                     </div>
                 `).join('');
-            } else {
-                document.getElementById('alunoTreinosGrid').innerHTML = '<div class="empty-state">Nenhum treino prescrito ainda</div>';
-            }
 
         } catch (error) {
-            console.error('Erro ao carregar aluno dashboard:', error);
+            console.error('❌ Error loading aluno dashboard:', error);
             showToast('❌ Erro ao carregar dados');
         }
     }
 
-    function populateAlunoSelects() {
-        const selects = ['workoutAlunoSelect', 'dietAlunoSelect'];
-        selects.forEach(id => {
-            const select = document.getElementById(id);
-            if (select) {
-                select.innerHTML = '<option value="">Escolha um aluno...</option>' + 
-                    alunosList.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-            }
-        });
-    }
+    function loadProfileForm() {
+        document.getElementById('profileName').value = userData.name || '';
+        document.getElementById('profileEmail').value = userData.email || '';
+        document.getElementById('profilePhone').value = userData.phone || '';
 
-    async function approveAluno(alunoId) {
-        try {
-            await db.collection('alunos').doc(alunoId).update({
-                status: 'approved',
-                personalTrainerId: currentUser.uid
-            });
-            showToast('✅ Aluno aprovado!');
-            loadDashboard();
-        } catch (error) {
-            showToast('❌ Erro ao aprovar aluno');
+        if (userType === 'aluno') {
+            document.getElementById('profileGoal').value = userData.goal || '';
+            document.getElementById('profileDOB').value = userData.dateOfBirth || '';
+            document.getElementById('profileHeight').value = userData.measurements?.height || '';
+            document.getElementById('profileWeight').value = userData.measurements?.weight || '';
+            document.getElementById('profileChest').value = userData.measurements?.chest || '';
+            document.getElementById('profileWaist').value = userData.measurements?.waist || '';
+            document.getElementById('profileHips').value = userData.measurements?.hips || '';
+            document.getElementById('profileArm').value = userData.measurements?.arm || '';
+        } else {
+            document.getElementById('profileBio').value = userData.bio || '';
+        }
+
+        // Set photo
+        if (userData.profilePhoto) {
+            document.getElementById('profilePhotoPreview').style.backgroundImage = `url('${userData.profilePhoto}')`;
+            document.getElementById('profilePhotoPreview').style.backgroundSize = 'cover';
+            document.getElementById('profilePhotoPreview').style.color = 'transparent';
         }
     }
 
-    async function rejectAluno(alunoId) {
-        try {
-            await db.collection('alunos').doc(alunoId).update({
-                status: 'rejected'
-            });
-            showToast('❌ Aluno rejeitado');
-            loadDashboard();
-        } catch (error) {
-            showToast('❌ Erro ao rejeitar aluno');
-        }
+    function previewPhoto() {
+        const file = document.getElementById('photoInput').files[0];
+        if (!file) return;
+
+        selectedPhotoFile = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const preview = document.getElementById('profilePhotoPreview');
+            preview.style.backgroundImage = `url('${e.target.result}')`;
+            preview.style.backgroundSize = 'cover';
+            preview.style.color = 'transparent';
+        };
+        reader.readAsDataURL(file);
     }
 
-    async function handleAddStudent(e) {
+    async function handleProfileSave(e) {
         e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        btn.textContent = 'Adicionando...';
+        console.log('💾 Saving profile...');
 
         try {
-            await db.collection('alunos').add({
+            let photoURL = userData.profilePhoto;
+
+            // Upload photo if selected
+            if (selectedPhotoFile) {
+                console.log('📸 Uploading photo...');
+                const storageRef = storage.ref(`profiles/${currentUser.uid}`);
+                await storageRef.put(selectedPhotoFile);
+                photoURL = await storageRef.getDownloadURL();
+                console.log('✅ Photo uploaded');
+            }
+
+            // Prepare data
+            const updates = {
+                name: document.getElementById('profileName').value,
+                phone: document.getElementById('profilePhone').value,
+                profilePhoto: photoURL,
+                updatedAt: new Date()
+            };
+
+            if (userType === 'aluno') {
+                updates.goal = document.getElementById('profileGoal').value;
+                updates.dateOfBirth = document.getElementById('profileDOB').value;
+                updates.measurements = {
+                    height: parseFloat(document.getElementById('profileHeight').value) || 0,
+                    weight: parseFloat(document.getElementById('profileWeight').value) || 0,
+                    chest: parseFloat(document.getElementById('profileChest').value) || 0,
+                    waist: parseFloat(document.getElementById('profileWaist').value) || 0,
+                    hips: parseFloat(document.getElementById('profileHips').value) || 0,
+                    arm: parseFloat(document.getElementById('profileArm').value) || 0
+                };
+            } else {
+                updates.bio = document.getElementById('profileBio').value;
+            }
+
+            // Save to Firestore
+            await db.collection('users').doc(currentUser.uid).update(updates);
+            console.log('✅ Profile updated');
+
+            userData = {...userData, ...updates};
+            selectedPhotoFile = null;
+            showToast('✅ Perfil salvo com sucesso!');
+            goToDashboard();
+
+        } catch (error) {
+            console.error('❌ Error saving profile:', error);
+            showToast('❌ Erro ao salvar perfil');
+        }
+    }
+
+    async function handleAddAluno(e) {
+        e.preventDefault();
+        console.log('➕ Adding aluno...');
+
+        try {
+            await db.collection('users').add({
+                type: 'aluno',
                 personalTrainerId: currentUser.uid,
-                name: document.getElementById('studentName').value,
-                email: document.getElementById('studentEmail').value,
-                phone: document.getElementById('studentPhone').value,
-                goal: document.getElementById('studentGoal').value,
-                dateOfBirth: document.getElementById('studentDOB').value,
-                gender: document.getElementById('studentGender').value,
+                name: document.getElementById('alunoName').value,
+                email: document.getElementById('alunoEmail').value,
+                phone: document.getElementById('alunoPhone').value,
+                goal: document.getElementById('alunoGoal').value,
+                dateOfBirth: document.getElementById('alunoDOB').value,
+                gender: document.getElementById('alunoGender').value,
                 measurements: {
-                    height: parseFloat(document.getElementById('studentHeight').value) || 0,
-                    weight: parseFloat(document.getElementById('studentWeight').value) || 0,
-                    chest: parseFloat(document.getElementById('studentChest').value) || 0,
-                    waist: parseFloat(document.getElementById('studentWaist').value) || 0,
-                    hips: parseFloat(document.getElementById('studentHips').value) || 0,
-                    arm: parseFloat(document.getElementById('studentArm').value) || 0,
-                    leg: parseFloat(document.getElementById('studentLeg').value) || 0
+                    height: parseFloat(document.getElementById('alunoHeight').value) || 0,
+                    weight: parseFloat(document.getElementById('alunoWeight').value) || 0,
+                    chest: parseFloat(document.getElementById('alunoChest').value) || 0,
+                    waist: parseFloat(document.getElementById('alunoWaist').value) || 0,
+                    hips: parseFloat(document.getElementById('alunoHips').value) || 0,
+                    arm: parseFloat(document.getElementById('alunoArm').value) || 0
                 },
                 gamification: {
                     points: 0,
@@ -1438,284 +643,98 @@
                     level: 'Novato'
                 },
                 status: 'approved',
-                uid: '',
-                createdAt: new Date()
+                profilePhoto: '',
+                createdAt: new Date(),
+                updatedAt: new Date()
             });
 
-            showToast('✅ Aluno adicionado!');
-            e.target.reset();
-            goToPage('dashboard');
-            loadDashboard();
+            console.log('✅ Aluno added');
+            showToast('✅ Aluno adicionado com sucesso!');
+            document.getElementById('addAlunoForm').reset();
+            goToDashboard();
+            loadPTDashboard();
+
         } catch (error) {
-            console.error('Erro:', error);
+            console.error('❌ Error adding aluno:', error);
             showToast('❌ Erro ao adicionar aluno');
         }
-
-        btn.disabled = false;
-        btn.textContent = 'Adicionar Aluno';
     }
 
-    async function handleCreateWorkout(e) {
-        e.preventDefault();
-        const alunoId = document.getElementById('workoutAlunoSelect').value;
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        btn.textContent = 'Criando...';
-
+    async function approveAluno(alunoId) {
         try {
-            const exercisesInputs = document.querySelectorAll('.exercise-input');
-            const exercises = [];
-
-            exercisesInputs.forEach(input => {
-                const row = input.closest('.exercise-row');
-                if (row) {
-                    const name = row.querySelector('[data-field="name"]').value;
-                    const sets = parseInt(row.querySelector('[data-field="sets"]').value) || 0;
-                    const reps = parseInt(row.querySelector('[data-field="reps"]').value) || 0;
-                    const weight = parseFloat(row.querySelector('[data-field="weight"]').value) || 0;
-                    const rest = parseInt(row.querySelector('[data-field="rest"]').value) || 0;
-
-                    if (name) {
-                        exercises.push({ name, sets, reps, weight, rest });
-                    }
-                }
+            await db.collection('users').doc(alunoId).update({
+                status: 'approved',
+                personalTrainerId: currentUser.uid
             });
-
-            await db.collection('treinos').add({
-                alunoId,
-                personalTrainerId: currentUser.uid,
-                name: document.getElementById('workoutName').value,
-                difficulty: document.getElementById('workoutDifficulty').value,
-                description: document.getElementById('workoutDesc').value,
-                exercises,
-                status: 'active',
-                createdAt: new Date()
-            });
-
-            showToast('✅ Treino criado!');
-            e.target.reset();
-            goToPage('dashboard');
-            loadDashboard();
+            showToast('✅ Aluno aprovado!');
+            loadPTDashboard();
         } catch (error) {
-            console.error('Erro:', error);
-            showToast('❌ Erro ao criar treino');
+            console.error('❌ Error:', error);
+            showToast('❌ Erro ao aprovar');
         }
-
-        btn.disabled = false;
-        btn.textContent = 'Criar Treino';
     }
 
-    async function handleCreateDiet(e) {
-        e.preventDefault();
-        const alunoId = document.getElementById('dietAlunoSelect').value;
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        btn.textContent = 'Salvando...';
-
+    async function rejectAluno(alunoId) {
         try {
-            const mealsInputs = document.querySelectorAll('.meal-row');
-            const refeicoes = [];
-
-            mealsInputs.forEach(input => {
-                const nome = input.querySelector('[data-field="mealName"]').value;
-                const alimentos = input.querySelector('[data-field="foods"]').value;
-                const horario = input.querySelector('[data-field="time"]').value;
-
-                if (nome) {
-                    refeicoes.push({ nome, alimentos, horario });
-                }
+            await db.collection('users').doc(alunoId).update({
+                status: 'rejected'
             });
-
-            await db.collection('dietas').add({
-                alunoId,
-                personalTrainerId: currentUser.uid,
-                objetivo: document.getElementById('dietGoal').value,
-                refeicoes,
-                notes: document.getElementById('dietNotes').value,
-                status: 'active',
-                createdAt: new Date()
-            });
-
-            showToast('✅ Dieta salva!');
-            e.target.reset();
-            goToPage('dashboard');
+            showToast('❌ Aluno rejeitado');
+            loadPTDashboard();
         } catch (error) {
-            console.error('Erro:', error);
-            showToast('❌ Erro ao criar dieta');
+            console.error('❌ Error:', error);
         }
-
-        btn.disabled = false;
-        btn.textContent = 'Salvar Dieta';
     }
 
-    async function handleUpdateProfile(e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        btn.textContent = 'Salvando...';
-
+    async function deleteAluno(alunoId) {
+        if (!confirm('Tem certeza que deseja deletar este aluno?')) return;
         try {
-            const updates = {
-                name: document.getElementById('profileNameInput').value,
-                phone: document.getElementById('profilePhoneInput').value,
-                updatedAt: new Date()
-            };
-
-            if (userRole === 'pt') {
-                updates.bio = document.getElementById('profileBioInput').value;
-                await db.collection('users').doc(currentUser.uid).update(updates);
-            } else {
-                updates.goal = document.getElementById('profileGoalInput').value;
-                updates.dateOfBirth = document.getElementById('profileDOBInput').value;
-                updates.measurements = {
-                    height: parseFloat(document.getElementById('profileHeightInput').value) || 0,
-                    weight: parseFloat(document.getElementById('profileWeightInput').value) || 0,
-                    chest: parseFloat(document.getElementById('profileChestInput').value) || 0,
-                    waist: parseFloat(document.getElementById('profileWaistInput').value) || 0,
-                    hips: parseFloat(document.getElementById('profileHipsInput').value) || 0,
-                    arm: parseFloat(document.getElementById('profileArmInput').value) || 0,
-                    leg: parseFloat(document.getElementById('profileLegInput').value) || 0
-                };
-                await db.collection('alunos').doc(userProfile.id).update(updates);
-            }
-
-            showToast('✅ Perfil atualizado!');
-            loadDashboard();
-            loadProfileForm();
+            await db.collection('users').doc(alunoId).delete();
+            showToast('✅ Aluno deletado');
+            loadPTDashboard();
         } catch (error) {
-            console.error('Erro:', error);
-            showToast('❌ Erro ao atualizar perfil');
-        }
-
-        btn.disabled = false;
-        btn.textContent = 'Salvar Alterações';
-    }
-
-    function loadProfileForm() {
-        document.getElementById('profileNameInput').value = userProfile.name || '';
-        document.getElementById('profileEmailInput').value = userProfile.email || '';
-        document.getElementById('profilePhoneInput').value = userProfile.phone || '';
-
-        if (userRole === 'pt') {
-            document.getElementById('profileBioDiv').style.display = 'block';
-            document.getElementById('profileBioInput').value = userProfile.bio || '';
-        } else {
-            document.getElementById('profileGoalDiv').style.display = 'block';
-            document.getElementById('profileDOBDiv').style.display = 'block';
-            document.getElementById('profileHeightDiv').style.display = 'block';
-            document.getElementById('profileWeightDiv').style.display = 'block';
-            document.getElementById('profileChestDiv').style.display = 'block';
-            document.getElementById('profileWaistDiv').style.display = 'block';
-            document.getElementById('profileHipsDiv').style.display = 'block';
-            document.getElementById('profileArmDiv').style.display = 'block';
-            document.getElementById('profileLegDiv').style.display = 'block';
-
-            document.getElementById('profileGoalInput').value = userProfile.goal || '';
-            document.getElementById('profileDOBInput').value = userProfile.dateOfBirth || '';
-            document.getElementById('profileHeightInput').value = userProfile.measurements?.height || '';
-            document.getElementById('profileWeightInput').value = userProfile.measurements?.weight || '';
-            document.getElementById('profileChestInput').value = userProfile.measurements?.chest || '';
-            document.getElementById('profileWaistInput').value = userProfile.measurements?.waist || '';
-            document.getElementById('profileHipsInput').value = userProfile.measurements?.hips || '';
-            document.getElementById('profileArmInput').value = userProfile.measurements?.arm || '';
-            document.getElementById('profileLegInput').value = userProfile.measurements?.leg || '';
+            console.error('❌ Error:', error);
+            showToast('❌ Erro ao deletar');
         }
     }
 
-    async function loadRanking() {
-        try {
-            const snap = await db.collection('alunos').orderBy('gamification.totalPoints', 'desc').limit(20).get();
-            const alunos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            document.getElementById('rankingList').innerHTML = alunos.map((aluno, index) => `
-                <div class="ranking-row">
-                    <div class="rank-position">#${index + 1}</div>
-                    <div>${aluno.name}</div>
-                    <div>${aluno.gamification?.totalWorkouts || 0}</div>
-                    <div>${aluno.gamification?.totalPoints || 0}</div>
-                    <div>🔥 ${aluno.gamification?.streak || 0}</div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Erro:', error);
-            showToast('❌ Erro ao carregar ranking');
-        }
-    }
-
-    function goToPage(page) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(page + 'Page').classList.add('active');
-
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        event?.target?.classList.add('active');
-
-        if (page === 'profile') {
-            loadProfileForm();
-        } else if (page === 'ranking') {
-            loadRanking();
-        }
-    }
-
-    function addExerciseField() {
-        const container = document.getElementById('exercisesContainer');
-        const row = document.createElement('div');
-        row.className = 'exercise-row';
-        row.innerHTML = `
-            <div class="form-grid" style="margin-bottom: 12px;">
-                <input class="exercise-input" data-field="name" type="text" placeholder="Nome do exercício" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                <input type="number" data-field="sets" placeholder="Séries" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                <input type="number" data-field="reps" placeholder="Repetições" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                <input type="number" data-field="weight" placeholder="Peso (kg)" step="0.1" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                <input type="number" data-field="rest" placeholder="Descanso (s)" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-            </div>
-        `;
-        container.appendChild(row);
-    }
-
-    function addMealField() {
-        const container = document.getElementById('mealsContainer');
-        const row = document.createElement('div');
-        row.className = 'meal-row';
-        row.innerHTML = `
-            <div class="form-grid" style="margin-bottom: 12px;">
-                <input type="text" data-field="mealName" placeholder="Nome da refeição" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                <input type="text" data-field="foods" placeholder="Alimentos" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                <input type="time" data-field="time" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-            </div>
-        `;
-        container.appendChild(row);
-    }
-
-    function startWorkout(alunoId) {
-        window.location.href = `workout.html?alunoId=${alunoId}`;
-    }
-
-    function startExecuteWorkout(treinoId) {
-        window.location.href = `workout.html?treinoId=${treinoId}&alunoId=${userProfile.id}`;
-    }
-
-    function loadAlunoForWorkout() {
-        // Função vazia por enquanto
-    }
-
-    function sendMessage() {
-        // Chat será implementado no próximo arquivo
+    function goToDashboard() {
+        document.getElementById('profilePage').classList.add('hidden');
+        document.getElementById('addAlunoPage').classList.add('hidden');
+        document.getElementById('ptDashboard').classList.toggle('hidden', userType !== 'pt');
+        document.getElementById('alunoDashboard').classList.toggle('hidden', userType !== 'aluno');
     }
 
     function editAluno(alunoId) {
-        // Edição será implementada
+        // TODO: Implement edit aluno
+        showToast('⏳ Em desenvolvimento...');
     }
 
-    function handleLogout() {
+    function goToAddAluno() {
+        document.getElementById('ptDashboard').classList.add('hidden');
+        document.getElementById('profilePage').classList.add('hidden');
+        document.getElementById('addAlunoPage').classList.remove('hidden');
+    }
+
+    function startWorkout(treinoId) {
+        window.location.href = `workout.html?treinoId=${treinoId}`;
+    }
+
+    async function logout() {
         if (confirm('Tem certeza que deseja sair?')) {
-            auth.signOut();
-            window.location.href = 'index.html';
+            try {
+                await auth.signOut();
+                console.log('✅ Logged out');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+            }
         }
     }
 
     function showToast(msg) {
         const toast = document.createElement('div');
-        toast.className = 'toast';
+        toast.className = 'fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce';
         toast.textContent = msg;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
