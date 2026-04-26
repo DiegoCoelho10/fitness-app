@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#E07800">
     <title>💪 FITNESS - Transforme Seu Corpo</title>
     <style>
@@ -20,7 +20,9 @@
         }
 
         .landing {
-            background: linear-gradient(135deg, #E07800 0%, #FF9900 100%);
+            background: linear-gradient(135deg, rgba(224, 120, 0, 0.75) 0%, rgba(255, 153, 0, 0.75) 100%),
+                        url('https://i.imgur.com/PZM2tJg.jpg') center/cover;
+            background-attachment: fixed;
             color: white;
             min-height: 100vh;
             display: flex;
@@ -28,11 +30,13 @@
             padding: 20px;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
 
         .landing-content {
             text-align: center;
             max-width: 800px;
+            z-index: 1;
         }
 
         .landing-logo {
@@ -51,13 +55,14 @@
             font-size: 48px;
             font-weight: 700;
             margin-bottom: 12px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .landing-subtitle {
             font-size: 20px;
             opacity: 0.95;
             margin-bottom: 40px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
         .landing-features {
@@ -72,6 +77,7 @@
             padding: 20px;
             border-radius: 12px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .feature-icon {
@@ -122,7 +128,6 @@
             color: #E07800;
         }
 
-        /* MODAL AUTH */
         .auth-modal {
             display: none;
             position: fixed;
@@ -149,6 +154,8 @@
             width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: slideIn 0.5s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes slideIn {
@@ -274,7 +281,6 @@
 
         .btn-auth:disabled {
             opacity: 0.6;
-            cursor: not-allowed;
         }
 
         .auth-demo {
@@ -294,7 +300,19 @@
             border: none;
             font-size: 28px;
             cursor: pointer;
-            color: #999;
+            color: white;
+            z-index: 1001;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            z-index: 2000;
         }
 
         @media (max-width: 768px) {
@@ -334,22 +352,13 @@
                 font-size: 14px;
             }
         }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #333;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            z-index: 2000;
-        }
     </style>
 </head>
 <body>
 
 <div class="landing">
+    <button class="btn-close" onclick="closeAuth()">✕</button>
+    
     <div class="landing-content">
         <div class="landing-logo">💪</div>
         <h1 class="landing-title">FITNESS</h1>
@@ -389,7 +398,6 @@
     </div>
 </div>
 
-<!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal">
     <button class="btn-close" onclick="closeAuth()">✕</button>
     
@@ -403,7 +411,6 @@
             <button class="tab" onclick="switchTab('signup')">Cadastro</button>
         </div>
 
-        <!-- LOGIN -->
         <form id="loginForm" class="auth-form show" onsubmit="handleLogin(event)">
             <div class="error-message" id="loginError"></div>
             <div class="form-group">
@@ -417,7 +424,6 @@
             <button type="submit" class="btn-auth" id="loginBtn">Entrar</button>
         </form>
 
-        <!-- SIGNUP -->
         <form id="signupForm" class="auth-form" onsubmit="handleSignup(event)">
             <div class="error-message" id="signupError"></div>
             <div class="form-group">
@@ -441,13 +447,13 @@
             </div>
             <div class="form-group" id="codeDiv" style="display:none;">
                 <label>Código PT</label>
-                <input type="password" id="trainerCode" placeholder="Código de acesso">
+                <input type="password" id="trainerCode" placeholder="TRAINER2024">
             </div>
             <button type="submit" class="btn-auth" id="signupBtn">Cadastrar</button>
         </form>
 
         <div class="auth-demo">
-            💡 <strong>Demo:</strong> trainer@test.com / 123456 (PT) ou aluno@test.com / 123456
+            💡 Novo? Cadastre-se como Aluno. Será preciso aprovação do PT!
         </div>
     </div>
 </div>
@@ -517,7 +523,7 @@
             await auth.signInWithEmailAndPassword(email, password);
             window.location.href = 'app.html';
         } catch (error) {
-            errorDiv.textContent = '❌ ' + getErrorMessage(error.code);
+            errorDiv.textContent = '❌ Email ou senha incorretos';
             errorDiv.classList.add('show');
             btn.disabled = false;
             btn.textContent = 'Entrar';
@@ -535,7 +541,7 @@
         const errorDiv = document.getElementById('signupError');
 
         if (role === 'pt' && code !== 'TRAINER2024') {
-            errorDiv.textContent = '❌ Código inválido';
+            errorDiv.textContent = '❌ Código de PT inválido';
             errorDiv.classList.add('show');
             return;
         }
@@ -561,6 +567,7 @@
                     type: 'aluno',
                     name,
                     email,
+                    status: 'pending',
                     gamification: {
                         points: 0,
                         streak: 0,
@@ -571,24 +578,15 @@
                 });
             }
 
-            window.location.href = 'app.html';
+            showToast('✅ Cadastro realizado!');
+            closeAuth();
+            setTimeout(() => showAuth('login'), 1500);
         } catch (error) {
-            errorDiv.textContent = '❌ ' + getErrorMessage(error.code);
+            errorDiv.textContent = '❌ ' + (error.message || 'Erro ao cadastrar');
             errorDiv.classList.add('show');
             btn.disabled = false;
             btn.textContent = 'Cadastrar';
         }
-    }
-
-    function getErrorMessage(code) {
-        const messages = {
-            'auth/email-already-in-use': 'Email já cadastrado',
-            'auth/weak-password': 'Senha muito fraca',
-            'auth/invalid-email': 'Email inválido',
-            'auth/user-not-found': 'Usuário não encontrado',
-            'auth/wrong-password': 'Senha incorreta'
-        };
-        return messages[code] || 'Erro ao autenticar';
     }
 
     function showToast(msg) {
