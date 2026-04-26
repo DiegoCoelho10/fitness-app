@@ -1,166 +1,107 @@
 import { create } from 'zustand'
-import { auth, db } from '../services/firebaseConfig'
-import { 
-  createUserWithEmailAndPassword, 
+import { auth } from '../services/firebaseConfig'
+import {
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut,
-  onAuthStateChanged 
+  onAuthStateChanged
 } from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { getPersonalTrainer, createPersonalTrainer, getAluno } from '../services/firebaseService'
 
-export const useAuthStore = create((set) => ({
-  user: null,
-  loading: true,
-  error: null,
-  userRole: null,
-  hasAccess: true,
+export const useAuthStore = create((set) => {
+  // Monitor de auth changes
+  onAuthStateChanged(auth, async (firebaseUser) => {
+    if (firebaseUser) {
+      try {
+        const pt = await getPersonalTrainer(firebaseUser.uid)
+        if (pt) {
+          set({
+            user: firebaseUser,
+            userRole: 'personal_trainer',
+            loading: false
+          })
+          return
+        }
 
-  // Inicializa listener de autenticação
-  initAuth: () => {
-    onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        // Busca dados do usuário no Firestore
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
-        const userData = userDoc.data()
-        
+        const aluno = await getAluno(firebaseUser.uid)
+        if (aluno) {
+          set({
+            user: firebaseUser,
+            userRole: 'student',
+            loading: false
+          })
+          return
+        }
+
+        // Usuário sem role atribuída
         set({
           user: firebaseUser,
-          userRole: userData?.role || 'student',
-          loading: false,
+          userRole: null,
+          loading: false
         })
-      } else {
-        set({ user: null, userRole: null, loading: false })
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error)
+        set({ loading: false })
       }
-    })
-  },
-
-  // Login
-  login: async (email, password) => {
-    set({ loading: true, error: null })
-    try {
-      const result = await signInWithEmailAndPassword(auth, email, password)
-      const userDoc = await getDoc(doc(db, 'users', result.user.uid))
-      const userData = userDoc.data()
-      
+    } else {
       set({
-        user: result.user,
-        userRole: userData?.role || 'student',
-        loading: false,
-      })
-      return result.user
-    } catch (error) {
-      set({ 
-        error: error.message,
-        loading: false 
-      })
-      throw error
-    }
-  },
-
-  // Cadastro
-  signup: async (email, password, name, role = 'student') => {
-    set({ loading: true, error: null })
-    try {
-      const result = await createUserWithEmailAndPassword(auth, email, password)
-      
-      // Salva dados no Firestore
-      await setDoc(doc(db, 'users', result.user.uid), {
-        uid: result.user.uid,
-        name,
-        email,
-        role,
-        createdAt: new Date(),
-        ...(role === 'personal_trainer' ? {
-          bio: '',
-          phone: '',
-          profilePhoto: '',
-          subscription: {
-            status: 'trial',
-            plan: 'free',
-            startDate: new Date(),
-            renewDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-          }
-        } : {
-          personalTrainerId: null,
-          goal: '',
-          level: 'iniciante',
-          gamification: {
-            points: 0,
-            streak: 0,
-            lastCheckIn: null,
-            badges: [],
-            totalWorkouts: 0,
-          },
-          accessStatus: {
-            hasAccess: true,
-            reason: 'active',
-          }
-        })
-      })
-
-      // Salva informações de acesso (para alunos)
-      if (role === 'student') {
-        await setDoc(doc(db, 'access_control', result.user.uid), {
-          status: 'active',
-          reason: 'new_user',
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        })
-      }
-
-      set({
-        user: result.user,
-        userRole: role,
-        loading: false,
-      })
-      return result.user
-    } catch (error) {
-      set({ 
-        error: error.message,
-        loading: false 
-      })
-      throw error
-    }
-  },
-
-  // Logout
-  logout: async () => {
-    set({ loading: true, error: null })
-    try {
-      await signOut(auth)
-      set({ 
-        user: null, 
+        user: null,
         userRole: null,
-        loading: false 
+        loading: false
       })
-    } catch (error) {
-      set({ 
-        error: error.message,
-        loading: false 
-      })
-      throw error
     }
-  },
+  })
 
-  // Verifica acesso do aluno
-  checkAccess: async (userId) => {
-    try {
-      const accessDoc = await getDoc(doc(db, 'access_control', userId))
-      const data = accessDoc.data()
-      
-      if (!data) {
-        set({ hasAccess: true })
-        return true
+  return {
+    user: null,
+    userRole: null,
+    loading: true,
+
+    login: async (email, password) => {
+      try {
+        const result = await signInWithEmailAndPassword(auth, email, password)
+        return result.user
+      } catch (error) {
+        throw error
       }
+    },
 
-      const expiresAt = data.expiresAt?.toDate?.() || new Date(data.expiresAt)
-      const isActive = data.status === 'active' && expiresAt > new Date()
-      
-      set({ hasAccess: isActive })
-      return isActive
-    } catch (error) {
-      console.error('Erro ao verificar acesso:', error)
-      set({ hasAccess: true })
+    signup: async (email, password, name, role) => {
+      try {
+        const result = await createUserWithEmailAndPassword(auth, email, password)
+        const user = result.user
+
+        if (role === 'personal_trainer') {
+          await createPersonalTrainer(user.uid, {
+            name,
+            email,
+            phone: '',
+            bio: '',
+            specialty: ''
+          })
+        }
+
+        return user
+      } catch (error) {
+        throw error
+      }
+    },
+
+    logout: async () => {
+      try {
+        await signOut(auth)
+        set({
+          user: null,
+          userRole: null
+        })
+      } catch (error) {
+        throw error
+      }
+    },
+
+    checkAuth: () => {
+      // Este método agora é chamado via onAuthStateChanged acima
       return true
     }
-  },
-}))
+  }
+})
